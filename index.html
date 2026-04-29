@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0f"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="資產追蹤"/>
+<title>資產追蹤器</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="icons/icon-192.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"/>
+<style>
+:root{
+  --bg:#0a0a0f;
+  --bg1:#12121a;
+  --bg2:#1a1a26;
+  --bg3:#22223a;
+  --accent:#6C63FF;
+  --accent2:#a89cff;
+  --green:#22c55e;
+  --red:#f43f5e;
+  --amber:#f59e0b;
+  --text:#f0eeff;
+  --text2:#8b85b0;
+  --text3:#4a4570;
+  --border:#2a2845;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden}
+body{display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative}
+
+/* Status bar spacer */
+.status-bar{height:var(--safe-top);background:var(--bg)}
+
+/* Header */
+.header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase}
+.sync-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.sync-btn:active{background:var(--bg2);transform:scale(0.92)}
+.sync-btn svg{width:14px;height:14px}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Scroll area */
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(80px + var(--safe-bottom))}
+.scroll-area::-webkit-scrollbar{display:none}
+
+/* Total hero */
+.hero{padding:8px 20px 24px;position:relative}
+.hero-label{font-size:11px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:6px}
+.hero-amount{font-size:38px;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1}
+.hero-sub{font-size:12px;color:var(--text2);margin-top:6px;font-family:'DM Mono',monospace}
+.last-update{font-size:10px;color:var(--text3);margin-top:4px;font-family:'DM Mono',monospace}
+
+/* Allocation bar */
+.alloc-bar{height:4px;border-radius:2px;background:var(--bg3);overflow:hidden;display:flex;margin:0 20px 20px}
+.alloc-seg{height:100%;transition:width .5s ease}
+
+/* Asset cards grid */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 20px}
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:14px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.card:active{transform:scale(0.97);background:var(--bg2)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.card.stock::before{background:var(--accent)}
+.card.crypto::before{background:var(--amber)}
+.card.demand::before{background:var(--green)}
+.card.fixed::before{background:#38bdf8}
+.card-icon{font-size:18px;margin-bottom:8px}
+.card-label{font-size:10px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:4px}
+.card-amt{font-size:16px;font-weight:500;color:var(--text)}
+.card-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
+
+/* Section */
+.section-wrap{padding:0 20px;margin-bottom:24px}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-name{font-size:12px;font-weight:500;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace}
+.add-btn{font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--accent2);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.add-btn:active{background:var(--bg2)}
+
+/* List */
+.list-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.list-item{display:flex;align-items:center;padding:14px 16px;gap:12px;border-bottom:1px solid var(--border);transition:background .15s;position:relative}
+.list-item:last-child{border-bottom:none}
+.list-item:active{background:var(--bg2)}
+.item-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;font-family:'DM Mono',monospace}
+.item-body{flex:1;min-width:0}
+.item-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-detail{font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
+.item-right{text-align:right;flex-shrink:0}
+.item-val{font-size:14px;font-weight:500;color:var(--text);font-family:'DM Mono',monospace}
+.item-pnl{font-size:10px;margin-top:2px;font-family:'DM Mono',monospace}
+.pnl-up{color:var(--green)}
+.pnl-dn{color:var(--red)}
+.pnl-na{color:var(--text3)}
+.item-price-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;margin-top:3px;display:inline-block}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:3px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.act-row{display:flex;gap:4px;align-items:center;margin-left:4px}
+.act-icon-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;flex-shrink:0}
+.act-icon-btn:active{background:var(--bg2)}
+.del-btn:active{color:var(--red);border-color:var(--red)}
+.empty-state{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace}
+
+/* Tab bar */
+.tab-bar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg1);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe-bottom)}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 12px;cursor:pointer;gap:3px;transition:color .15s}
+.tab-item svg{width:20px;height:20px}
+.tab-item span{font-size:9px;letter-spacing:0.05em;font-family:'DM Mono',monospace}
+.tab-item.active{color:var(--accent2)}
+.tab-item:not(.active){color:var(--text3)}
+
+/* Pages */
+.page{display:none;height:100%;flex-direction:column}
+.page.active{display:flex}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--bg1);border:1px solid var(--border);border-radius:24px 24px 0 0;padding:0 0 calc(24px + var(--safe-bottom));width:100%;max-width:430px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.modal-overlay.open .modal-sheet{transform:translateY(0)}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 20px}
+.modal-title-row{display:flex;align-items:center;justify-content:space-between;padding:0 20px 16px}
+.modal-title{font-size:16px;font-weight:500}
+.modal-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:0 20px}
+.field{margin-bottom:14px}
+.field-label{font-size:11px;color:var(--text2);margin-bottom:6px;letter-spacing:0.05em;font-family:'DM Mono',monospace}
+.field-input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:15px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border .15s;-webkit-appearance:none}
+.field-input:focus{border-color:var(--accent)}
+.field-input::placeholder{color:var(--text3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.save-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:8px;transition:opacity .15s}
+.save-btn:active{opacity:0.8}
+.currency-toggle{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;margin-bottom:4px}
+.cur-opt{flex:1;padding:6px 4px;text-align:center;font-size:12px;border-radius:8px;cursor:pointer;font-family:'DM Mono',monospace;color:var(--text3);transition:all .15s}
+.cur-opt.active{background:var(--accent);color:#fff}
+.rate-info{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;margin-bottom:10px}
+.toast{position:fixed;top:calc(var(--safe-top) + 60px);left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:12px;color:var(--text2);opacity:0;transition:all .3s;z-index:300;white-space:nowrap;font-family:'DM Mono',monospace}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="status-bar"></div>
+
+<!-- Pages -->
+<div id="page-home" class="page active">
+  <div class="header">
+    <span class="header-title">資產總覽</span>
+    <button class="sync-btn" id="sync-btn" onclick="syncAll()" title="更新價格">
+      <svg id="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+      </svg>
+    </button>
+  </div>
+  <div class="scroll-area">
+    <div class="hero">
+      <div class="hero-label">Total Assets</div>
+      <div class="hero-amount" id="grand-total">NT$0</div>
+      <div class="hero-sub" id="grand-sub">—</div>
+      <div class="last-update" id="last-update"></div>
+    </div>
+    <div class="alloc-bar" id="alloc-bar"></div>
+    <div class="cards-grid">
+      <div class="card stock" onclick="switchPage('stocks')">
+        <div class="card-icon">📈</div>
+        <div class="card-label">股票</div>
+        <div class="card-amt" id="h-stock">NT$0</div>
+        <div class="card-sub" id="h-stock-sub">0 檔</div>
+      </div>
+      <div class="card crypto" onclick="switchPage('crypto')">
+        <div class="card-icon">₿</div>
+        <div class="card-label">加密貨幣</div>
+        <div class="card-amt" id="h-crypto">NT$0</div>
+        <div class="card-sub" id="h-crypto-sub">0 種</div>
+      </div>
+      <div class="card demand" onclick="switchPage('savings')">
+        <div class="card-icon">🏦</div>
+        <div class="card-label">活存</div>
+        <div class="card-amt" id="h-demand">NT$0</div>
+        <div class="card-sub" id="h-demand-sub">0 帳戶</div>
+      </div>
+      <div class="card fixed" onclick="switchPage('savings')">
+        <div class="card-icon">🔒</div>
+        <div class="card-label">定存</div>
+        <div class="card-amt" id="h-fixed">NT$0</div>
+        <div class="card-sub" id="h-fixed-sub">0 筆</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-stocks" class="page">
+  <div class="header">
+    <span class="header-title">股票持倉</span>
+    <button class="add-btn" onclick="openModal('stock')">+ 新增</button>
+  </div>
+  <div class="scroll-area">
+    <div class="section-wrap">
+      <div id="stock-list"></div>
+      <div id="stock-summary" style="text-align:right;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-crypto" class="page">
+  <div class="header">
+    <span class="header-title">加密貨幣</span>
+    <button class="add-btn" onclick="openModal('crypto')">+ 新增</button>
+  </div>
+  <div class="scroll-area">
+    <div class="section-wrap">
+      <div id="crypto-list"></div>
+      <div id="crypto-summary" style="text-align:right;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px"></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-savings" class="page">
+  <div class="header">
+    <span class="header-title">台幣存款</span>
+  </div>
+  <div class="scroll-area">
+    <div class="section-wrap">
+      <div class="section-head">
+        <span class="section-name">活期存款</span>
+        <button class="add-btn" onclick="openModal('demand')">+ 新增</button>
+      </div>
+      <div id="demand-list"></div>
+    </div>
+    <div class="section-wrap">
+      <div class="section-head">
+        <span class="section-name">定期存款</span>
+        <button class="add-btn" onclick="openModal('fixed')">+ 新增</button>
+      </div>
+      <div id="fixed-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <div class="tab-item active" id="tab-home" onclick="switchPage('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+    </svg>
+    <span>總覽</span>
+  </div>
+  <div class="tab-item" id="tab-stocks" onclick="switchPage('stocks')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+      <polyline points="16 7 22 7 22 13"/>
+    </svg>
+    <span>股票</span>
+  </div>
+  <div class="tab-item" id="tab-crypto" onclick="switchPage('crypto')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042l-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893L4.645 9.15m7.522.24l-.353-2.018m0 0-.356-2.02M6.2 7.11l-1.354-.238"/>
+    </svg>
+    <span>加密</span>
+  </div>
+  <div class="tab-item" id="tab-savings" onclick="switchPage('savings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="7" width="20" height="14" rx="2"/>
+      <path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+    </svg>
+    <span>存款</span>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title-row">
+      <span class="modal-title" id="modal-title">新增</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ─────────────────────────────────────────────────────
+const DB_KEY = 'asset-tracker-v2';
+let state = { stock:[], crypto:[], demand:[], fixed:[], usdTwd:32, lastSync:null };
+let currentPage = 'home';
+let modalType = null, editIdx = -1;
+let syncing = false;
+
+function load(){
+  try{
+    const s = localStorage.getItem(DB_KEY);
+    if(s) state = { ...state, ...JSON.parse(s) };
+  }catch(e){}
+}
+function save(){
+  localStorage.setItem(DB_KEY, JSON.stringify(state));
+}
+load();
+
+// ── Formatting ────────────────────────────────────────────────
+const fmtTWD = n => 'NT$' + Math.round(n).toLocaleString('zh-TW');
+const fmtNum = n => {
+  if(n === '' || n === undefined || n === null) return '—';
+  const x = parseFloat(n);
+  if(isNaN(x)) return '—';
+  if(Math.abs(x) >= 1) return x.toLocaleString('zh-TW', {maximumFractionDigits:4});
+  return x.toPrecision(4);
+};
+
+// ── Price Fetching ─────────────────────────────────────────────
+// USD/TWD rate
+async function fetchUsdTwd(){
+  try{
+    const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    if(d.rates && d.rates.TWD){
+      state.usdTwd = d.rates.TWD;
+    }
+  }catch(e){
+    // Use stored or default
+    try {
+      const r2 = await fetch('https://open.er-api.com/v6/latest/USD');
+      if(r2.ok){const d2=await r2.json();if(d2.rates?.TWD)state.usdTwd=d2.rates.TWD;}
+    }catch(e2){}
+  }
+}
+
+// Crypto prices via CoinGecko (free, no key)
+async function fetchCryptoPrices(){
+  const coins = [...new Set(state.crypto.map(x=>x.coinId).filter(Boolean))];
+  if(!coins.length) return;
+  try{
+    const ids = coins.join(',');
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd,twd`);
+    if(!r.ok) throw new Error();
+    const d = await r.json();
+    state.crypto = state.crypto.map(x => {
+      if(!x.coinId || !d[x.coinId]) return x;
+      const usd = d[x.coinId].usd;
+      const twd = d[x.coinId].twd || (usd * state.usdTwd);
+      return { ...x, priceUsd: usd, priceTwd: twd };
+    });
+  }catch(e){
+    // Try backup
+    try {
+      const coins2 = [...new Set(state.crypto.map(x=>x.coinId).filter(Boolean))];
+      if(!coins2.length) return;
+      for(const coin of coins2){
+        const r2 = await fetch(`https://api.coingecko.com/api/v3/coins/${coin}?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false`);
+        if(r2.ok){
+          const d2 = await r2.json();
+          const usd = d2.market_data?.current_price?.usd;
+          if(usd){
+            const twd = usd * state.usdTwd;
+            state.crypto = state.crypto.map(x => x.coinId===coin ? {...x,priceUsd:usd,priceTwd:twd} : x);
+          }
+        }
+      }
+    }catch(e2){}
+  }
+}
+
+// Taiwan stock prices via Yahoo Finance (CORS proxy)
+async function fetchStockPrices(){
+  const tickers = [...new Set(state.stock.map(x=>x.ticker).filter(Boolean))];
+  if(!tickers.length) return;
+  for(const ticker of tickers){
+    try{
+      // Add .TW suffix for Taiwan stocks if not already present
+      const sym = ticker.includes('.') ? ticker : (ticker.match(/^\d+$/) ? ticker+'.TW' : ticker);
+      const r = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`);
+      if(!r.ok) continue;
+      const d = await r.json();
+      const price = d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+      if(price){
+        state.stock = state.stock.map(x =>
+          x.ticker === ticker ? { ...x, price: parseFloat(price.toFixed(2)) } : x
+        );
+      }
+    }catch(e){}
+  }
+}
+
+async function syncAll(){
+  if(syncing) return;
+  syncing = true;
+  document.getElementById('sync-icon').classList.add('spin');
+  showToast('正在更新價格…');
+  try{
+    await fetchUsdTwd();
+    await Promise.all([fetchCryptoPrices(), fetchStockPrices()]);
+    state.lastSync = new Date().toISOString();
+    save();
+    renderAll();
+    showToast('✓ 價格已更新');
+  }catch(e){
+    showToast('更新失敗，使用本地資料');
+  }
+  syncing = false;
+  document.getElementById('sync-icon').classList.remove('spin');
+}
+
+// ── Computed ───────────────────────────────────────────────────
+function stockTwd(x){ return (x.shares||0) * (x.price||0); }
+function cryptoTwd(x){
+  const amt = parseFloat(x.amount)||0;
+  if(x.currency==='USD') return amt * (x.priceUsd||parseFloat(x.price)||0) * state.usdTwd;
+  return amt * (x.priceTwd||parseFloat(x.price)||0);
+}
+function totalStock(){ return state.stock.reduce((s,x)=>s+stockTwd(x),0); }
+function totalCrypto(){ return state.crypto.reduce((s,x)=>s+cryptoTwd(x),0); }
+function totalDemand(){ return state.demand.reduce((s,x)=>s+(parseFloat(x.balance)||0),0); }
+function totalFixed(){ return state.fixed.reduce((s,x)=>s+(parseFloat(x.balance)||0),0); }
+function grandTotal(){ return totalStock()+totalCrypto()+totalDemand()+totalFixed(); }
+
+// ── Render ─────────────────────────────────────────────────────
+function renderAll(){
+  renderHome();
+  renderStocks();
+  renderCrypto();
+  renderSavings();
+}
+
+function renderHome(){
+  const st=totalStock(),cr=totalCrypto(),dm=totalDemand(),fx=totalFixed(),grand=grandTotal();
+  document.getElementById('grand-total').textContent = fmtTWD(grand);
+  const sub = grand>0 ? `股票 ${Math.round(st/grand*100)}% · 加密 ${Math.round(cr/grand*100)}% · 存款 ${Math.round((dm+fx)/grand*100)}%` : '新增資產開始追蹤';
+  document.getElementById('grand-sub').textContent = sub;
+  if(state.lastSync){
+    const d = new Date(state.lastSync);
+    document.getElementById('last-update').textContent = `更新於 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+  document.getElementById('h-stock').textContent = fmtTWD(st);
+  document.getElementById('h-stock-sub').textContent = state.stock.length+' 檔';
+  document.getElementById('h-crypto').textContent = fmtTWD(cr);
+  document.getElementById('h-crypto-sub').textContent = state.crypto.length+' 種';
+  document.getElementById('h-demand').textContent = fmtTWD(dm);
+  document.getElementById('h-demand-sub').textContent = state.demand.length+' 帳戶';
+  document.getElementById('h-fixed').textContent = fmtTWD(fx);
+  document.getElementById('h-fixed-sub').textContent = state.fixed.length+' 筆';
+
+  // Alloc bar
+  const bar = document.getElementById('alloc-bar');
+  if(grand===0){bar.innerHTML='';return;}
+  bar.innerHTML = [
+    {v:st,c:'#6C63FF'},{v:cr,c:'#f59e0b'},{v:dm,c:'#22c55e'},{v:fx,c:'#38bdf8'}
+  ].map(x=>`<div class="alloc-seg" style="width:${(x.v/grand*100).toFixed(1)}%;background:${x.c}"></div>`).join('');
+}
+
+function renderStocks(){
+  const el = document.getElementById('stock-list');
+  if(!state.stock.length){
+    el.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持股<br>點擊右上角新增</div></div>';
+    document.getElementById('stock-summary').textContent='';
+    return;
+  }
+  el.innerHTML='<div class="list-wrap">'+state.stock.map((x,i)=>{
+    const val=stockTwd(x);
+    const cost=(parseFloat(x.shares)||0)*(parseFloat(x.cost)||0);
+    const gain=x.cost?val-cost:null;
+    const gainPct=x.cost&&cost>0?(val-cost)/cost*100:null;
+    const pnl = gain!==null
+      ? `<span class="${gain>=0?'pnl-up':'pnl-dn'}">${gain>=0?'+':''}${fmtTWD(gain)} (${gainPct>=0?'+':''}${gainPct.toFixed(1)}%)</span>`
+      : `<span class="pnl-na">未填成本</span>`;
+    const ticker = x.ticker ? `<span class="item-price-badge"><span class="live-dot"></span>${x.ticker} ${fmtNum(x.price)}</span>` : '';
+    return `<div class="list-item">
+      <div class="item-dot" style="background:#1e1a3a;color:#a89cff">${(x.name||'?').slice(0,2)}</div>
+      <div class="item-body">
+        <div class="item-name">${x.name||'—'}</div>
+        <div class="item-detail">${fmtNum(x.shares)} 股 × ${fmtNum(x.price)} TWD</div>
+        ${ticker}
+      </div>
+      <div class="item-right">
+        <div class="item-val">${fmtTWD(val)}</div>
+        <div class="item-pnl">${pnl}</div>
+      </div>
+      <div class="act-row">
+        <button class="act-icon-btn" onclick="openEditModal('stock',${i})">✎</button>
+        <button class="act-icon-btn del-btn" onclick="deleteItem('stock',${i})">×</button>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+  document.getElementById('stock-summary').textContent='總市值 '+fmtTWD(totalStock());
+}
+
+function renderCrypto(){
+  const el = document.getElementById('crypto-list');
+  if(!state.crypto.length){
+    el.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持幣<br>點擊右上角新增</div></div>';
+    document.getElementById('crypto-summary').textContent='';
+    return;
+  }
+  el.innerHTML='<div class="list-wrap">'+state.crypto.map((x,i)=>{
+    const twd = cryptoTwd(x);
+    const amt = parseFloat(x.amount)||0;
+    const costPerUnit = parseFloat(x.cost)||0;
+    const currentUsd = x.priceUsd || parseFloat(x.price)||0;
+    const currentTwd = x.priceTwd || currentUsd*state.usdTwd;
+    const costTwd = x.currency==='USD' ? costPerUnit*state.usdTwd : costPerUnit;
+    const totalCost = costTwd * amt;
+    const gain = x.cost ? twd - totalCost : null;
+    const gainPct = x.cost && totalCost>0 ? (twd-totalCost)/totalCost*100 : null;
+    const pnl = gain!==null
+      ? `<span class="${gain>=0?'pnl-up':'pnl-dn'}">${gain>=0?'+':''}${fmtTWD(gain)} (${gainPct>=0?'+':''}${gainPct.toFixed(1)}%)</span>`
+      : `<span class="pnl-na">未填成本</span>`;
+    const priceDisplay = x.priceUsd ? `$${x.priceUsd.toLocaleString('en-US',{maximumFractionDigits:2})} USD` : '';
+    const badge = priceDisplay ? `<span class="item-price-badge"><span class="live-dot"></span>${priceDisplay}</span>` : '';
+    return `<div class="list-item">
+      <div class="item-dot" style="background:#2a1f0a;color:#f59e0b">${(x.name||'?').slice(0,2)}</div>
+      <div class="item-body">
+        <div class="item-name">${x.name||'—'}</div>
+        <div class="item-detail">${fmtNum(x.amount)} 枚 × ${fmtTWD(currentTwd)}</div>
+        ${badge}
+      </div>
+      <div class="item-right">
+        <div class="item-val">${fmtTWD(twd)}</div>
+        <div class="item-pnl">${pnl}</div>
+      </div>
+      <div class="act-row">
+        <button class="act-icon-btn" onclick="openEditModal('crypto',${i})">✎</button>
+        <button class="act-icon-btn del-btn" onclick="deleteItem('crypto',${i})">×</button>
+      </div>
+    </div>`;
+  }).join('')+'</div>';
+  document.getElementById('crypto-summary').textContent=`總市值 ${fmtTWD(totalCrypto())} · 1 USD = ${state.usdTwd.toFixed(2)} TWD`;
+}
+
+function renderSavings(){
+  const dm=document.getElementById('demand-list');
+  const fx=document.getElementById('fixed-list');
+  dm.innerHTML = state.demand.length ? '<div class="list-wrap">'+state.demand.map((x,i)=>`
+    <div class="list-item">
+      <div class="item-dot" style="background:#0a1f12;color:#22c55e">活</div>
+      <div class="item-body">
+        <div class="item-name">${x.name||'—'}</div>
+        <div class="item-detail">年利率 ${x.rate||0}%</div>
+      </div>
+      <div class="item-right"><div class="item-val">${fmtTWD(x.balance)}</div></div>
+      <div class="act-row">
+        <button class="act-icon-btn" onclick="openEditModal('demand',${i})">✎</button>
+        <button class="act-icon-btn del-btn" onclick="deleteItem('demand',${i})">×</button>
+      </div>
+    </div>`).join('')+'</div>'
+    : '<div class="list-wrap"><div class="empty-state">尚無活存記錄</div></div>';
+  fx.innerHTML = state.fixed.length ? '<div class="list-wrap">'+state.fixed.map((x,i)=>`
+    <div class="list-item">
+      <div class="item-dot" style="background:#0a1624;color:#38bdf8">定</div>
+      <div class="item-body">
+        <div class="item-name">${x.name||'—'}</div>
+        <div class="item-detail">利率 ${x.rate||0}% · 到期 ${x.maturity||'—'}</div>
+      </div>
+      <div class="item-right"><div class="item-val">${fmtTWD(x.balance)}</div></div>
+      <div class="act-row">
+        <button class="act-icon-btn" onclick="openEditModal('fixed',${i})">✎</button>
+        <button class="act-icon-btn del-btn" onclick="deleteItem('fixed',${i})">×</button>
+      </div>
+    </div>`).join('')+'</div>'
+    : '<div class="list-wrap"><div class="empty-state">尚無定存記錄</div></div>';
+}
+
+// ── Modal ──────────────────────────────────────────────────────
+const COIN_IDS = {
+  'BTC':'bitcoin','ETH':'ethereum','BNB':'binancecoin','SOL':'solana',
+  'XRP':'ripple','ADA':'cardano','DOGE':'dogecoin','TRX':'tron',
+  'LINK':'chainlink','DOT':'polkadot','MATIC':'matic-network','UNI':'uniswap',
+  'AVAX':'avalanche-2','ATOM':'cosmos','LTC':'litecoin','BCH':'bitcoin-cash',
+  'NEAR':'near','FIL':'filecoin','ICP':'internet-computer','APT':'aptos',
+  'ARB':'arbitrum','OP':'optimism','PEPE':'pepe','WIF':'dogwifcoin',
+  'SUI':'sui','TON':'the-open-network','SHIB':'shiba-inu'
+};
+function guessCoindId(name){
+  if(!name) return '';
+  const up = name.toUpperCase().trim();
+  if(COIN_IDS[up]) return COIN_IDS[up];
+  return name.toLowerCase().trim().replace(/\s+/g,'-');
+}
+
+let cryptoCurrency = 'USD';
+
+function openModal(type, idx=-1){
+  modalType=type; editIdx=idx;
+  const isEdit = idx>=0;
+  const item = isEdit ? state[type][idx] : null;
+  const titles={stock:'股票',crypto:'加密貨幣',demand:'台幣活存',fixed:'台幣定存'};
+  document.getElementById('modal-title').textContent=(isEdit?'編輯':'新增')+titles[type];
+  const body = document.getElementById('modal-body');
+
+  if(type==='stock'){
+    body.innerHTML=`
+      <div class="field"><div class="field-label">股票名稱</div><input class="field-input" id="f-name" placeholder="例：台積電" value="${item?.name||''}"/></div>
+      <div class="field"><div class="field-label">股票代號（用於自動更新）</div><input class="field-input" id="f-ticker" placeholder="例：2330（台股）/ AAPL（美股）" value="${item?.ticker||''}"/></div>
+      <div class="field-row">
+        <div class="field"><div class="field-label">持有股數</div><input class="field-input" id="f-shares" type="number" placeholder="1000" value="${item?.shares||''}"/></div>
+        <div class="field"><div class="field-label">現價 (TWD)</div><input class="field-input" id="f-price" type="number" placeholder="820" value="${item?.price||''}"/></div>
+      </div>
+      <div class="field"><div class="field-label">成本價 TWD（選填，計算損益）</div><input class="field-input" id="f-cost" type="number" placeholder="750" value="${item?.cost||''}"/></div>
+      <button class="save-btn" onclick="saveModal()">儲存</button>`;
+  }else if(type==='crypto'){
+    cryptoCurrency = item?.currency||'USD';
+    body.innerHTML=`
+      <div class="field"><div class="field-label">幣種名稱</div><input class="field-input" id="f-name" placeholder="例：Bitcoin" value="${item?.name||''}" oninput="autoCoinId(this.value)"/></div>
+      <div class="field"><div class="field-label">CoinGecko ID（用於自動更新）</div><input class="field-input" id="f-coinId" placeholder="例：bitcoin, ethereum" value="${item?.coinId||''}"/></div>
+      <div class="field"><div class="field-label">持有數量</div><input class="field-input" id="f-amount" type="number" placeholder="0.5" value="${item?.amount||''}"/></div>
+      <div class="field">
+        <div class="field-label">手動填價格（若無法自動更新時使用）</div>
+        <div class="currency-toggle">
+          <div class="cur-opt ${cryptoCurrency==='USD'?'active':''}" onclick="setCurrency('USD')">USD</div>
+          <div class="cur-opt ${cryptoCurrency==='TWD'?'active':''}" onclick="setCurrency('TWD')">TWD</div>
+        </div>
+        <div class="rate-info" id="rate-info">1 USD ≈ ${state.usdTwd.toFixed(2)} TWD</div>
+        <input class="field-input" id="f-price" type="number" placeholder="${cryptoCurrency==='USD'?'例：60000':'例：1920000'}" value="${item?.price||''}"/>
+      </div>
+      <div class="field"><div class="field-label">成本價 ${cryptoCurrency}（選填）</div><input class="field-input" id="f-cost" type="number" placeholder="買入均價" value="${item?.cost||''}"/></div>
+      <button class="save-btn" onclick="saveModal()">儲存</button>`;
+  }else if(type==='demand'){
+    body.innerHTML=`
+      <div class="field"><div class="field-label">銀行 / 帳戶名稱</div><input class="field-input" id="f-name" placeholder="例：台灣銀行活存" value="${item?.name||''}"/></div>
+      <div class="field"><div class="field-label">目前餘額 (TWD)</div><input class="field-input" id="f-balance" type="number" placeholder="500000" value="${item?.balance||''}"/></div>
+      <div class="field"><div class="field-label">年利率 % (選填)</div><input class="field-input" id="f-rate" type="number" placeholder="0.8" value="${item?.rate||''}"/></div>
+      <button class="save-btn" onclick="saveModal()">儲存</button>`;
+  }else if(type==='fixed'){
+    body.innerHTML=`
+      <div class="field"><div class="field-label">銀行 / 方案名稱</div><input class="field-input" id="f-name" placeholder="例：郵局一年定存" value="${item?.name||''}"/></div>
+      <div class="field"><div class="field-label">本金 (TWD)</div><input class="field-input" id="f-balance" type="number" placeholder="1000000" value="${item?.balance||''}"/></div>
+      <div class="field-row">
+        <div class="field"><div class="field-label">年利率 %</div><input class="field-input" id="f-rate" type="number" placeholder="1.5" value="${item?.rate||''}"/></div>
+        <div class="field"><div class="field-label">到期日</div><input class="field-input" id="f-maturity" type="date" value="${item?.maturity||''}"/></div>
+      </div>
+      <button class="save-btn" onclick="saveModal()">儲存</button>`;
+  }
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>body.querySelector('.field-input')?.focus(),350);
+}
+
+function autoCoinId(name){
+  const id = guessCoindId(name);
+  const el = document.getElementById('f-coinId');
+  if(el && !el.value) el.value = id;
+}
+
+function setCurrency(cur){
+  cryptoCurrency=cur;
+  document.querySelectorAll('.cur-opt').forEach(e=>e.classList.toggle('active',e.textContent===cur));
+  document.getElementById('f-price').placeholder=cur==='USD'?'例：60000':'例：1920000';
+  const label=document.getElementById('f-cost')?.previousElementSibling;
+  if(label) label.textContent=`成本價 ${cur}（選填）`;
+}
+
+function openEditModal(type, idx){ openModal(type, idx); }
+
+function saveModal(){
+  const type=modalType;
+  let obj={};
+  if(type==='stock'){
+    const name=v('name'), ticker=v('ticker'), shares=parseFloat(v('shares')), price=parseFloat(v('price')), cost=v('cost');
+    if(!name||isNaN(shares)||isNaN(price)){showToast('請填寫必要欄位');return;}
+    obj={name, ticker:ticker.toUpperCase(), shares, price, cost:cost?parseFloat(cost):''};
+  }else if(type==='crypto'){
+    const name=v('name'), coinId=v('coinId'), amount=parseFloat(v('amount')), price=v('price'), cost=v('cost');
+    if(!name||isNaN(amount)){showToast('請填寫必要欄位');return;}
+    const existing = editIdx>=0 ? state.crypto[editIdx] : {};
+    obj={name, coinId:coinId||guessCoindId(name), amount, price:price?parseFloat(price):'', cost:cost?parseFloat(cost):'', currency:cryptoCurrency,
+      priceUsd: existing.priceUsd||'', priceTwd: existing.priceTwd||''};
+  }else if(type==='demand'){
+    const name=v('name'), balance=parseFloat(v('balance')), rate=v('rate');
+    if(!name||isNaN(balance)){showToast('請填寫必要欄位');return;}
+    obj={name, balance, rate:rate?parseFloat(rate):0};
+  }else if(type==='fixed'){
+    const name=v('name'), balance=parseFloat(v('balance')), rate=v('rate'), maturity=v('maturity');
+    if(!name||isNaN(balance)){showToast('請填寫必要欄位');return;}
+    obj={name, balance, rate:rate?parseFloat(rate):0, maturity};
+  }
+  if(editIdx>=0) state[type][editIdx]=obj; else state[type].push(obj);
+  save(); closeModal(); renderAll();
+}
+
+function v(id){ const el=document.getElementById('f-'+id); return el?el.value.trim():''; }
+
+function deleteItem(type, idx){
+  if(!confirm('確定刪除？')) return;
+  state[type].splice(idx,1);
+  save(); renderAll();
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  modalType=null; editIdx=-1;
+}
+function closeModalOutside(e){
+  if(e.target===document.getElementById('modal-overlay')) closeModal();
+}
+
+// ── Navigation ─────────────────────────────────────────────────
+function switchPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('tab-'+page)?.classList.add('active');
+  currentPage=page;
+  if(page==='home') renderHome();
+}
+
+// ── Toast ──────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ── Service Worker ─────────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+// ── Init ───────────────────────────────────────────────────────
+renderAll();
+// Auto-sync on first load if data exists
+if(state.stock.length||state.crypto.length){
+  setTimeout(syncAll, 1500);
+}
+</script>
+</body>
+</html>
