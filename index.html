@@ -6,107 +6,103 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="資產追蹤"/>
+<meta name="theme-color" id="theme-meta" content="#0a0a0f"/>
 <title>資產追蹤器</title>
 <link rel="manifest" href="manifest.json"/>
 <link rel="apple-touch-icon" href="icons/icon-180.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500;700&display=swap"/>
 <style>
-/* ── Themes ── */
 :root{
   --bg:#0a0a0f;--bg1:#12121a;--bg2:#1a1a26;--bg3:#22223a;
   --accent:#00c9b1;--accent2:#4dffd9;
   --green:#22c55e;--red:#f43f5e;--amber:#f59e0b;--gold:#d4af37;--blue:#38bdf8;
   --text:#f0fffe;--text2:#7ab8b0;--text3:#3a5f5a;--border:#1e3532;
+  --card-bg:#12121a;--shadow:0 2px 20px rgba(0,201,177,0.07);
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --shadow:0 2px 16px rgba(0,201,177,0.08);
 }
 [data-theme="light"]{
   --bg:#f0faf9;--bg1:#ffffff;--bg2:#e8f5f3;--bg3:#d0ebe8;
   --accent:#009e8c;--accent2:#007a6b;
   --green:#16a34a;--red:#dc2626;--amber:#d97706;--gold:#b8860b;--blue:#0284c7;
   --text:#0a2422;--text2:#3a6b65;--text3:#8ab5b0;--border:#c5e0dc;
-  --shadow:0 2px 16px rgba(0,158,140,0.10);
+  --card-bg:#ffffff;--shadow:0 2px 16px rgba(0,158,140,0.10);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{height:100%;background:var(--bg)}
-body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;transition:background .3s,color .3s}
-/* Status bar */
-.status-bar{height:var(--safe-top);background:var(--bg);flex-shrink:0;transition:background .3s}
+html,body{height:100%;background:var(--bg)}
+body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;transition:background .25s,color .25s}
+.status-bar{height:var(--safe-top);background:var(--bg);flex-shrink:0}
 /* Header */
-.header{padding:12px 18px 10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-.header-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:0.15em;color:var(--text2);text-transform:uppercase}
+.header{padding:10px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.header-title{font-size:13px;font-weight:500;color:var(--text)}
+.header-center{flex:1;text-align:center;font-size:15px;font-weight:600;color:var(--text)}
 .header-right{display:flex;gap:6px;align-items:center}
-.icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg1);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:var(--shadow)}
-.icon-btn:active{transform:scale(0.92);background:var(--bg2)}
+.icon-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg1);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .18s;flex-shrink:0}
+.icon-btn:active{transform:scale(0.91)}
 .icon-btn svg{width:14px;height:14px}
 .spin{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* Currency pill */
-.cur-pill{font-size:10px;font-family:'DM Mono',monospace;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg1);color:var(--accent);cursor:pointer;font-weight:500}
+.cur-pill{font-size:10px;font-family:'DM Mono',monospace;padding:5px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg1);color:var(--accent);cursor:pointer;font-weight:500;letter-spacing:.05em}
 /* Scroll */
-.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(72px + var(--safe-bottom))}
+.scroll-area{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(68px + var(--safe-bottom))}
 .scroll-area::-webkit-scrollbar{display:none}
 /* Hero */
-.hero{padding:8px 18px 18px}
-.hero-label{font-size:10px;color:var(--text3);letter-spacing:0.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:4px}
-.hero-amount{font-size:36px;font-weight:700;color:var(--text);letter-spacing:-1px;line-height:1}
-.hero-amount span{font-size:18px;font-weight:400;margin-right:2px;color:var(--text2)}
+.hero{padding:4px 16px 14px}
+.hero-label{font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:2px}
+.hero-amount{font-size:44px;font-weight:700;color:var(--text);letter-spacing:-1.5px;line-height:1.05}
+.hero-sym{font-size:22px;font-weight:400;color:var(--text2);margin-right:1px;vertical-align:baseline}
 .hero-sub{font-size:11px;color:var(--text2);margin-top:5px;font-family:'DM Mono',monospace}
-.last-update{font-size:10px;color:var(--text3);margin-top:3px;font-family:'DM Mono',monospace}
+.last-update{font-size:10px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
 /* Alloc bar */
-.alloc-bar{height:3px;border-radius:2px;background:var(--bg3);overflow:hidden;display:flex;margin:0 18px 16px}
-.alloc-seg{height:100%;transition:width .5s ease}
-/* Cards */
-.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 18px}
-.card{background:var(--bg1);border:1px solid var(--border);border-radius:18px;padding:14px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.alloc-bar{height:3px;border-radius:2px;background:var(--bg3);overflow:hidden;display:flex;margin:0 16px 14px}
+.alloc-seg{height:100%;transition:width .5s}
+/* Cards grid — 2x3 for home */
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 16px 16px}
+.card{background:var(--bg1);border:1px solid var(--border);border-radius:16px;padding:13px;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden;box-shadow:var(--shadow)}
 .card:active{transform:scale(0.96)}
-.card-stripe{position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
-.card-icon{font-size:20px;margin-bottom:8px}
-.card-label{font-size:10px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:3px}
-.card-amt{font-size:17px;font-weight:600;color:var(--text)}
+.card-stripe{position:absolute;top:0;left:0;right:0;height:2px}
+.card-icon{font-size:18px;margin-bottom:6px}
+.card-label{font-size:10px;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;font-family:'DM Mono',monospace;margin-bottom:2px}
+.card-amt{font-size:16px;font-weight:600;color:var(--text)}
 .card-sub{font-size:10px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
 /* Section */
-.section-wrap{padding:0 18px;margin-bottom:22px}
+.section-wrap{padding:0 16px;margin-bottom:20px}
 .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.section-name{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:0.08em;text-transform:uppercase;font-family:'DM Mono',monospace}
-.add-btn{font-size:11px;padding:5px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--accent);cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .15s}
+.section-name{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.07em;text-transform:uppercase;font-family:'DM Mono',monospace}
+.add-btn{font-size:11px;padding:5px 11px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--accent);cursor:pointer;font-family:'Noto Sans TC',sans-serif}
 .add-btn:active{background:var(--bg2)}
 /* List */
-.list-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
-.list-item{display:flex;align-items:center;padding:12px 14px;gap:10px;border-bottom:1px solid var(--border)}
+.list-wrap{background:var(--bg1);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+.list-item{display:flex;align-items:center;padding:11px 13px;gap:9px;border-bottom:1px solid var(--border)}
 .list-item:last-child{border-bottom:none}
-.item-dot{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;flex-shrink:0;font-family:'DM Mono',monospace;overflow:hidden}
-.item-dot img{width:100%;height:100%;object-fit:cover;border-radius:10px}
+.item-dot{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;overflow:hidden}
+.item-dot img{width:100%;height:100%;object-fit:cover;border-radius:9px}
 .item-body{flex:1;min-width:0}
-.item-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.item-detail{font-size:11px;color:var(--text3);margin-top:2px;font-family:'DM Mono',monospace}
-.item-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;margin-top:3px;display:inline-block}
-.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);display:inline-block;margin-right:3px;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.item-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item-detail{font-size:11px;color:var(--text3);margin-top:1px;font-family:'DM Mono',monospace}
+.item-badge{font-size:9px;padding:2px 5px;border-radius:4px;background:var(--bg3);color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px;display:inline-block}
+.live-dot{width:4px;height:4px;border-radius:50%;background:var(--green);display:inline-block;margin-right:3px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .item-right{text-align:right;flex-shrink:0}
-.item-val{font-size:14px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
-.item-pnl{font-size:10px;margin-top:2px;font-family:'DM Mono',monospace}
+.item-val{font-size:13px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.item-pnl{font-size:10px;margin-top:1px;font-family:'DM Mono',monospace}
 .pnl-up{color:var(--green)}.pnl-dn{color:var(--red)}.pnl-na{color:var(--text3)}
-.act-row{display:flex;gap:4px;margin-left:6px}
-.act-icon-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .15s}
-.act-icon-btn:active{background:var(--bg2)}
+.act-row{display:flex;gap:3px;margin-left:5px}
+.act-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.act-btn:active{background:var(--bg2)}
 .del-btn:active{color:var(--red)!important;border-color:var(--red)!important}
-.empty-state{text-align:center;padding:28px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
-.summary-row{text-align:right;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px}
-/* Tab bar — key fix for iPhone safe area */
+.empty-state{text-align:center;padding:24px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
+.summary-row{text-align:right;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:6px}
+/* Tab bar */
 .tab-bar{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;
-  background:var(--bg1);border-top:1px solid var(--border);
-  display:flex;
-  padding-bottom:var(--safe-bottom);
-  /* ensure it always covers the home indicator */
-  min-height:calc(56px + var(--safe-bottom));
+  width:100%;max-width:430px;background:var(--bg1);border-top:1px solid var(--border);
+  display:flex;padding-bottom:var(--safe-bottom);
+  min-height:calc(54px + var(--safe-bottom));z-index:100;
 }
-.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 10px;cursor:pointer;gap:3px;transition:color .15s}
-.tab-item svg{width:20px;height:20px}
-.tab-item span{font-size:9px;letter-spacing:0.05em;font-family:'DM Mono',monospace}
+.tab-item{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px;cursor:pointer;gap:2px;transition:color .15s}
+.tab-item svg{width:19px;height:19px}
+.tab-item span{font-size:9px;letter-spacing:.04em;font-family:'DM Mono',monospace}
 .tab-item.active{color:var(--accent)}
 .tab-item:not(.active){color:var(--text3)}
 /* Pages */
@@ -115,72 +111,76 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 /* Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
 .modal-overlay.open{display:flex}
-.modal-sheet{
-  background:var(--bg1);border:1px solid var(--border);
-  border-radius:24px 24px 0 0;
-  padding:0 0 calc(16px + var(--safe-bottom));
-  width:100%;max-width:430px;
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
-  max-height:90vh;overflow-y:auto;
-}
+.modal-sheet{background:var(--bg1);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:0 0 calc(14px + var(--safe-bottom));width:100%;max-width:430px;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);max-height:92vh;overflow-y:auto}
 .modal-sheet::-webkit-scrollbar{display:none}
 .modal-overlay.open .modal-sheet{transform:translateY(0)}
-.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border);margin:12px auto 14px}
-.modal-title-row{display:flex;align-items:center;justify-content:space-between;padding:0 18px 12px}
-.modal-title{font-size:16px;font-weight:600}
-.modal-close{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.modal-body{padding:0 18px}
-.field{margin-bottom:12px}
-.field-label{font-size:11px;color:var(--text2);margin-bottom:5px;letter-spacing:0.05em;font-family:'DM Mono',monospace}
-.field-input,.field-select{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:15px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border .15s;-webkit-appearance:none;appearance:none}
+.modal-handle{width:34px;height:4px;border-radius:2px;background:var(--border);margin:11px auto 13px}
+.modal-title-row{display:flex;align-items:center;justify-content:space-between;padding:0 16px 11px}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{width:27px;height:27px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center}
+.modal-body{padding:0 16px}
+.field{margin-bottom:11px}
+.field-label{font-size:11px;color:var(--text2);margin-bottom:4px;letter-spacing:.04em;font-family:'DM Mono',monospace}
+.field-input,.field-select{width:100%;padding:10px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:15px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border .15s;-webkit-appearance:none;appearance:none}
 .field-input:focus,.field-select:focus{border-color:var(--accent)}
 .field-input::placeholder{color:var(--text3)}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.save-btn{width:100%;padding:14px;background:var(--accent);border:none;border-radius:14px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:8px;letter-spacing:.02em}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.save-btn{width:100%;padding:13px;background:var(--accent);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:6px}
 .save-btn:active{opacity:.8}
-.hint{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;margin:4px 0 8px}
-/* Radio group */
-.radio-group{display:flex;gap:8px;margin-bottom:2px}
-.radio-opt{flex:1;display:flex;align-items:center;gap:7px;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:border .15s}
-.radio-opt input[type=radio]{accent-color:var(--accent);width:14px;height:14px}
+.hint{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;margin:3px 0 8px}
+.radio-group{display:flex;gap:7px}
+.radio-opt{flex:1;display:flex;align-items:center;gap:6px;padding:9px 11px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;cursor:pointer}
+.radio-opt input[type=radio]{accent-color:var(--accent);width:13px;height:13px}
 .radio-opt span{font-size:13px}
 /* Ledger */
-.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:0 18px;margin-bottom:14px}
-.cal-month{font-size:15px;font-weight:600}
-.cal-nav-btn{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--bg1);color:var(--text2);cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 18px;margin-bottom:14px}
+.view-toggle{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px;margin:0 16px 12px}
+.vt-opt{flex:1;padding:6px 4px;text-align:center;font-size:11px;border-radius:7px;cursor:pointer;font-family:'DM Mono',monospace;color:var(--text3);transition:all .15s}
+.vt-opt.active{background:var(--bg1);color:var(--accent);box-shadow:var(--shadow)}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:12px}
+.cal-month{font-size:14px;font-weight:600}
+.cal-nav-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:var(--bg1);color:var(--text2);cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 16px;margin-bottom:12px}
 .cal-dow{font-size:10px;color:var(--text3);text-align:center;padding:2px 0;font-family:'DM Mono',monospace}
-.cal-day{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:12px;position:relative;transition:background .15s;font-family:'DM Mono',monospace}
+.cal-day{aspect-ratio:1;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:11px;position:relative;font-family:'DM Mono',monospace;transition:background .15s}
 .cal-day:active{background:var(--bg3)}
-.cal-day.today{background:var(--bg3);font-weight:500}
+.cal-day.today{background:var(--bg3);font-weight:600}
 .cal-day.selected{background:var(--accent)!important;color:#fff}
-.cal-day.has-entry::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--amber);position:absolute;bottom:3px}
+.cal-day.has-entry::after{content:'';width:4px;height:4px;border-radius:50%;background:var(--amber);position:absolute;bottom:2px}
 .cal-day.selected.has-entry::after{background:#fff}
 .cal-day.empty-day{pointer-events:none;opacity:0}
-.ledger-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 18px;margin-bottom:14px}
-.lcard{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow)}
-.lcard-label{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px}
-.lcard-val{font-size:13px;font-weight:600;font-family:'DM Mono',monospace}
+.ledger-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;padding:0 16px;margin-bottom:12px}
+.lcard{background:var(--bg1);border:1px solid var(--border);border-radius:11px;padding:9px 11px}
+.lcard-label{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.lcard-val{font-size:12px;font-weight:600;font-family:'DM Mono',monospace}
 .lv-income{color:var(--green)}.lv-expense{color:var(--red)}.lv-pos{color:var(--green)}.lv-neg{color:var(--red)}
-.day-detail{padding:0 18px;margin-bottom:14px}
-.day-detail-title{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:8px;letter-spacing:.05em}
-.entry-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg1);border:1px solid var(--border);border-radius:12px;margin-bottom:6px;box-shadow:var(--shadow)}
-.entry-cat{font-size:18px}
+.day-detail{padding:0 16px;margin-bottom:12px}
+.day-title{font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:7px}
+.entry-item{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--bg1);border:1px solid var(--border);border-radius:11px;margin-bottom:5px}
+.entry-cat{font-size:16px}
 .entry-body{flex:1}
 .entry-name{font-size:13px;font-weight:500}
-.entry-note{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace}
+.entry-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
 .entry-amt{font-size:13px;font-weight:600;font-family:'DM Mono',monospace;white-space:nowrap}
-.fixed-section{padding:0 18px;margin-bottom:16px}
-.fixed-section-title{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.fixed-section{padding:0 16px;margin-bottom:14px}
+.fixed-title{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+/* Period summary */
+.period-summary{padding:0 16px;margin-bottom:12px}
+.period-bar-wrap{margin-bottom:8px}
+.period-bar-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:3px}
+.period-bar-track{height:5px;background:var(--bg3);border-radius:3px;overflow:hidden}
+.period-bar-fill{height:100%;border-radius:3px}
 /* Toast */
-.toast{position:fixed;top:calc(var(--safe-top) + 54px);left:50%;transform:translateX(-50%) translateY(-8px);background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:8px 16px;font-size:12px;color:var(--text2);opacity:0;transition:all .3s;z-index:400;white-space:nowrap;font-family:'DM Mono',monospace;pointer-events:none;box-shadow:var(--shadow)}
+.toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-8px);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px 15px;font-size:12px;color:var(--text2);opacity:0;transition:all .25s;z-index:400;white-space:nowrap;font-family:'DM Mono',monospace;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* Cur select modal */
-.cur-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 18px 8px}
-.cur-opt{padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .15s}
-.cur-opt.active{border-color:var(--accent);background:var(--bg3)}
-.cur-opt-sym{font-size:18px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
-.cur-opt-name{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px}
+/* Cur modal grid */
+.cur-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 16px 6px}
+.cur-opt{padding:11px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;cursor:pointer;text-align:center;transition:all .15s}
+.cur-opt.active{border-color:var(--accent)}
+.cur-opt-sym{font-size:17px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
+.cur-opt-name{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px}
+/* Linked badge */
+.linked-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(0,201,177,.15);color:var(--accent);font-family:'DM Mono',monospace;display:inline-block;margin-top:2px}
 </style>
 </head>
 <body>
@@ -192,18 +192,14 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
     <span class="header-title">資產總覽</span>
     <div class="header-right">
       <button class="cur-pill" id="cur-pill" onclick="openCurModal()">TWD</button>
-      <button class="icon-btn" onclick="toggleTheme()" id="theme-btn" title="切換主題">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-      </button>
-      <button class="icon-btn" id="sync-btn" onclick="syncAll()">
-        <svg id="sync-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
-      </button>
+      <button class="icon-btn" onclick="toggleTheme()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></button>
+      <button class="icon-btn" onclick="syncAll()"><svg id="si0" class="spin-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></button>
     </div>
   </div>
   <div class="scroll-area">
     <div class="hero">
       <div class="hero-label">Total Assets</div>
-      <div class="hero-amount"><span id="cur-sym">NT$</span><span id="grand-total">0</span></div>
+      <div class="hero-amount"><span class="hero-sym" id="cur-sym">NT$</span><span id="grand-total">0</span></div>
       <div class="hero-sub" id="grand-sub">新增資產開始追蹤</div>
       <div class="last-update" id="last-update"></div>
     </div>
@@ -212,9 +208,16 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
       <div class="card" onclick="switchPage('invest')">
         <div class="card-stripe" style="background:var(--accent)"></div>
         <div class="card-icon">📈</div>
-        <div class="card-label">投資</div>
-        <div class="card-amt" id="h-invest">NT$0</div>
-        <div class="card-sub" id="h-invest-sub">股票 + 加密</div>
+        <div class="card-label">股票</div>
+        <div class="card-amt" id="h-stock">NT$0</div>
+        <div class="card-sub" id="h-stock-sub">0 檔</div>
+      </div>
+      <div class="card" onclick="switchPage('invest')">
+        <div class="card-stripe" style="background:var(--amber)"></div>
+        <div class="card-icon">₿</div>
+        <div class="card-label">加密貨幣</div>
+        <div class="card-amt" id="h-crypto">NT$0</div>
+        <div class="card-sub" id="h-crypto-sub">0 種</div>
       </div>
       <div class="card" onclick="switchPage('gold')">
         <div class="card-stripe" style="background:var(--gold)"></div>
@@ -226,16 +229,9 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
       <div class="card" onclick="switchPage('savings')">
         <div class="card-stripe" style="background:var(--green)"></div>
         <div class="card-icon">🏦</div>
-        <div class="card-label">活存</div>
-        <div class="card-amt" id="h-demand">NT$0</div>
-        <div class="card-sub" id="h-demand-sub">0 帳戶</div>
-      </div>
-      <div class="card" onclick="switchPage('savings')">
-        <div class="card-stripe" style="background:var(--blue)"></div>
-        <div class="card-icon">🔒</div>
-        <div class="card-label">定存</div>
-        <div class="card-amt" id="h-fixed">NT$0</div>
-        <div class="card-sub" id="h-fixed-sub">0 筆</div>
+        <div class="card-label">現金存款</div>
+        <div class="card-amt" id="h-savings">NT$0</div>
+        <div class="card-sub" id="h-savings-sub">0 帳戶</div>
       </div>
     </div>
   </div>
@@ -244,9 +240,10 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 <!-- ══ INVEST ══ -->
 <div id="page-invest" class="page">
   <div class="header">
-    <span class="header-title">投資持倉</span>
+    <div style="width:32px"></div>
+    <span class="header-center">投資持倉</span>
     <div class="header-right">
-      <button class="icon-btn" onclick="syncAll()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></button>
+      <button class="icon-btn" onclick="syncAll()"><svg class="spin-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></button>
     </div>
   </div>
   <div class="scroll-area">
@@ -266,7 +263,8 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 <!-- ══ GOLD ══ -->
 <div id="page-gold" class="page">
   <div class="header">
-    <span class="header-title">黃金資產</span>
+    <div style="width:32px"></div>
+    <span class="header-center">黃金資產</span>
     <button class="add-btn" onclick="openModal('gold')">+ 新增</button>
   </div>
   <div class="scroll-area">
@@ -279,14 +277,18 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 
 <!-- ══ SAVINGS ══ -->
 <div id="page-savings" class="page">
-  <div class="header"><span class="header-title">台幣存款</span></div>
+  <div class="header">
+    <div style="width:32px"></div>
+    <span class="header-center">現金存款</span>
+    <button class="add-btn" onclick="openModal('savings-new')">+ 新增</button>
+  </div>
   <div class="scroll-area">
     <div class="section-wrap">
-      <div class="section-head"><span class="section-name">活期存款</span><button class="add-btn" onclick="openModal('demand')">+ 新增</button></div>
+      <div class="section-head"><span class="section-name">活期存款</span></div>
       <div id="demand-list"></div>
     </div>
     <div class="section-wrap">
-      <div class="section-head"><span class="section-name">定期存款</span><button class="add-btn" onclick="openModal('fixed')">+ 新增</button></div>
+      <div class="section-head"><span class="section-name">定期存款</span></div>
       <div id="fixed-list"></div>
     </div>
   </div>
@@ -295,13 +297,19 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 <!-- ══ LEDGER ══ -->
 <div id="page-ledger" class="page">
   <div class="header">
-    <span class="header-title">記帳</span>
+    <div style="width:32px"></div>
+    <span class="header-center">記帳</span>
     <div class="header-right">
-      <button class="add-btn" onclick="openModal('fixed-item')">固定項目</button>
+      <button class="add-btn" onclick="openModal('fixed-item')">固定</button>
       <button class="add-btn" onclick="openModal('entry')" style="background:var(--accent);color:#fff;border-color:var(--accent)">+ 記帳</button>
     </div>
   </div>
   <div class="scroll-area">
+    <div class="view-toggle">
+      <div class="vt-opt active" id="vt-month" onclick="setLedgerView('month')">本月</div>
+      <div class="vt-opt" id="vt-half" onclick="setLedgerView('half')">近半年</div>
+      <div class="vt-opt" id="vt-year" onclick="setLedgerView('year')">今年</div>
+    </div>
     <div class="cal-nav">
       <button class="cal-nav-btn" onclick="calPrev()">‹</button>
       <span class="cal-month" id="cal-month-label"></span>
@@ -312,7 +320,10 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
       <div class="lcard"><div class="lcard-label">支出</div><div class="lcard-val lv-expense" id="lv-expense">NT$0</div></div>
       <div class="lcard"><div class="lcard-label">結餘</div><div class="lcard-val" id="lv-net">NT$0</div></div>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
+    <div id="ledger-cal-wrap">
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div id="period-summary-wrap"></div>
     <div class="day-detail" id="day-detail"></div>
     <div class="fixed-section" id="fixed-items-section"></div>
   </div>
@@ -351,125 +362,158 @@ body{height:100%;background:var(--bg);color:var(--text);font-family:'Noto Sans T
 </div>
 
 <!-- Currency Modal -->
-<div class="modal-overlay" id="cur-modal" onclick="closeCurModalOutside(event)">
+<div class="modal-overlay" id="cur-modal" onclick="if(event.target===this)closeCurModal()">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title-row"><span class="modal-title">顯示貨幣</span><button class="modal-close" onclick="closeCurModal()">✕</button></div>
     <div class="cur-grid" id="cur-grid"></div>
-    <div style="padding:0 18px 4px"><div class="hint">所有資產換算成所選貨幣顯示<br>匯率每次同步時自動更新</div></div>
+    <div style="padding:0 16px 4px"><div class="hint">資產總覽以所選貨幣顯示 · 匯率隨同步更新</div></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ══ State ══════════════════════════════════════════════════════
-const DB='asset-v4';
-let state={
-  stock:[],crypto:[],gold:[],demand:[],fixed:[],
-  entries:{},fixedItems:[],
-  usdTwd:32,xauUsd:3300,
+// ══ IMPORTANT: Keep DB key stable so user data persists across updates ══
+const DB = 'asset-tracker-stable-v1';
+
+const BLANK = {
+  stock:[], crypto:[], gold:[], demand:[], fixed:[],
+  entries:{}, fixedItems:[],
+  usdTwd:32, xauUsd:3300,
   rates:{USD:1,TWD:32,AUD:0.65,SGD:0.75,CNY:7.2},
-  displayCur:'TWD',theme:'dark',lastSync:null
+  displayCur:'TWD', theme:'dark', lastSync:null
 };
-function load(){try{const s=localStorage.getItem(DB);if(s)state={...state,...JSON.parse(s)};}catch(e){}}
-function save(){localStorage.setItem(DB,JSON.stringify(state));}
+let state = {...BLANK};
+function load(){
+  try{
+    const s = localStorage.getItem(DB);
+    if(s){
+      const parsed = JSON.parse(s);
+      // Migrate old keys if needed
+      if(localStorage.getItem('asset-v3') && !parsed.stock){
+        const old = JSON.parse(localStorage.getItem('asset-v3')||'{}');
+        state = {...BLANK,...old};
+      } else {
+        state = {...BLANK,...parsed};
+      }
+    }
+  }catch(e){}
+}
+function save(){ localStorage.setItem(DB, JSON.stringify(state)); }
 load();
 
 // ══ Theme ══════════════════════════════════════════════════════
 function applyTheme(){
-  document.documentElement.setAttribute('data-theme',state.theme);
-  const btn=document.getElementById('theme-btn');
-  if(btn)btn.title=state.theme==='dark'?'切換淺色':'切換深色';
-  // Update meta theme-color
-  const mc=document.querySelector('meta[name=theme-color]');
-  if(mc)mc.content=state.theme==='dark'?'#0a0a0f':'#f0faf9';
+  document.documentElement.setAttribute('data-theme', state.theme);
+  document.getElementById('theme-meta').content = state.theme==='dark'?'#0a0a0f':'#f0faf9';
 }
-function toggleTheme(){state.theme=state.theme==='dark'?'light':'dark';save();applyTheme();}
+function toggleTheme(){ state.theme = state.theme==='dark'?'light':'dark'; save(); applyTheme(); }
 applyTheme();
 
 // ══ Currency ══════════════════════════════════════════════════
-const CURRENCIES=[
+const CURRENCIES = [
   {code:'TWD',sym:'NT$',name:'新台幣'},{code:'USD',sym:'$',name:'美元'},
   {code:'AUD',sym:'A$',name:'澳幣'},{code:'SGD',sym:'S$',name:'新幣'},
   {code:'CNY',sym:'¥',name:'人民幣'}
 ];
-function curSym(){return CURRENCIES.find(c=>c.code===state.displayCur)?.sym||'NT$';}
+const CURRENCY_CODES = CURRENCIES.map(c=>c.code);
+function curSym(){ return CURRENCIES.find(c=>c.code===state.displayCur)?.sym||'NT$'; }
 function twdToDisplay(twd){
-  if(state.displayCur==='TWD')return twd;
-  const usd=twd/state.usdTwd;
-  const rate=state.rates[state.displayCur]||1;
-  return usd/rate;
+  if(state.displayCur==='TWD') return twd;
+  return (twd/state.usdTwd)/(state.rates[state.displayCur]||1);
 }
 function fmtDisplay(twd){
-  const v=twdToDisplay(twd);
-  const abs=Math.abs(v);
-  let s;
-  if(abs>=1000000) s=(v/1000000).toFixed(2)+'M';
-  else if(abs>=1000) s=Math.round(v).toLocaleString('zh-TW');
-  else s=v.toFixed(2);
+  const v = twdToDisplay(twd), abs=Math.abs(v);
+  let s = abs>=1000000?(v/1000000).toFixed(2)+'M':abs>=10?Math.round(v).toLocaleString('zh-TW'):v.toFixed(2);
   return curSym()+s;
 }
-function fmtTWD(n){return 'NT$'+Math.round(n).toLocaleString('zh-TW');}
+function fmtTWD(n){ return 'NT$'+Math.round(n).toLocaleString('zh-TW'); }
+function fmtCur(n, cur){
+  const c = CURRENCIES.find(x=>x.code===cur)||CURRENCIES[0];
+  return c.sym+Math.round(n).toLocaleString('zh-TW');
+}
+// Convert any currency amount to TWD
+function toTWD(amount, cur){
+  if(!cur||cur==='TWD') return parseFloat(amount)||0;
+  const usdRate = state.rates[cur]||1;
+  return (parseFloat(amount)||0)/usdRate*state.usdTwd;
+}
 function updateCurPill(){
-  document.getElementById('cur-pill').textContent=state.displayCur;
-  document.getElementById('cur-sym').textContent=curSym();
+  document.getElementById('cur-pill').textContent = state.displayCur;
+  document.getElementById('cur-sym').textContent = curSym();
 }
 function openCurModal(){
-  const grid=document.getElementById('cur-grid');
-  grid.innerHTML=CURRENCIES.map(c=>`
+  document.getElementById('cur-grid').innerHTML = CURRENCIES.map(c=>`
     <div class="cur-opt${c.code===state.displayCur?' active':''}" onclick="setCur('${c.code}')">
       <div class="cur-opt-sym">${c.sym}</div>
       <div class="cur-opt-name">${c.code} ${c.name}</div>
     </div>`).join('');
   document.getElementById('cur-modal').classList.add('open');
 }
-function closeCurModal(){document.getElementById('cur-modal').classList.remove('open');}
-function closeCurModalOutside(e){if(e.target===document.getElementById('cur-modal'))closeCurModal();}
-function setCur(code){state.displayCur=code;save();closeCurModal();updateCurPill();renderAll();}
+function closeCurModal(){ document.getElementById('cur-modal').classList.remove('open'); }
+function setCur(code){ state.displayCur=code; save(); closeCurModal(); updateCurPill(); renderAll(); }
 updateCurPill();
 
-// ══ Format ═════════════════════════════════════════════════════
-const fmtN=n=>{if(n===''||n==null)return '—';const x=parseFloat(n);if(isNaN(x))return '—';return Math.abs(x)>=1?x.toLocaleString('zh-TW',{maximumFractionDigits:4}):x.toPrecision(4);};
+const fmtN = n => {
+  if(n===''||n==null) return '—';
+  const x=parseFloat(n); if(isNaN(x)) return '—';
+  return Math.abs(x)>=1?x.toLocaleString('zh-TW',{maximumFractionDigits:4}):x.toPrecision(4);
+};
 
 // ══ Computed ══════════════════════════════════════════════════
-function stockVal(x){return(parseFloat(x.shares)||0)*(parseFloat(x.price)||0);}
-function stockPnl(x){const val=stockVal(x);const cost=parseFloat(x.totalCost);if(isNaN(cost))return null;return{gain:val-cost,pct:cost>0?(val-cost)/cost*100:0};}
-function cryptoVal(x){const amt=parseFloat(x.amount)||0;if(x.priceTwd)return amt*x.priceTwd;const p=parseFloat(x.price)||0;return x.currency==='USD'?amt*p*state.usdTwd:amt*p;}
-function cryptoPnl(x){const val=cryptoVal(x);const cost=parseFloat(x.totalCost);if(isNaN(cost))return null;return{gain:val-cost,pct:cost>0?(val-cost)/cost*100:0};}
-function goldPerGram(){return state.xauUsd*state.usdTwd/31.1035;}
-function goldVal(x){return(parseFloat(x.grams)||0)*(x.pricePerGram||goldPerGram());}
-function goldPnl(x){const val=goldVal(x);const cost=parseFloat(x.totalCost);if(isNaN(cost))return null;return{gain:val-cost,pct:cost>0?(val-cost)/cost*100:0};}
-function totalStock(){return state.stock.reduce((s,x)=>s+stockVal(x),0);}
-function totalCrypto(){return state.crypto.reduce((s,x)=>s+cryptoVal(x),0);}
-function totalInvest(){return totalStock()+totalCrypto();}
-function totalGold(){return state.gold.reduce((s,x)=>s+goldVal(x),0);}
-function totalDemand(){return state.demand.reduce((s,x)=>s+(parseFloat(x.balance)||0),0);}
-function totalFixed(){return state.fixed.reduce((s,x)=>s+(parseFloat(x.balance)||0),0);}
-function grandTotal(){return totalInvest()+totalGold()+totalDemand()+totalFixed();}
+function stockVal(x){ return (parseFloat(x.shares)||0)*(parseFloat(x.price)||0); }
+function stockPnl(x){ const v=stockVal(x),c=parseFloat(x.totalCost); if(isNaN(c)) return null; return {gain:v-c,pct:c>0?(v-c)/c*100:0}; }
+function cryptoVal(x){
+  const amt=parseFloat(x.amount)||0;
+  if(x.priceTwd) return amt*x.priceTwd;
+  const p=parseFloat(x.price)||0;
+  return x.currency==='USD'?amt*p*state.usdTwd:amt*p;
+}
+function cryptoPnl(x){ const v=cryptoVal(x),c=parseFloat(x.totalCost); if(isNaN(c)) return null; return {gain:v-c,pct:c>0?(v-c)/c*100:0}; }
+function goldPG(){ return state.xauUsd*state.usdTwd/31.1035; }
+function goldVal(x){ return (parseFloat(x.grams)||0)*(x.pricePerGram||goldPG()); }
+function goldPnl(x){ const v=goldVal(x),c=parseFloat(x.totalCost); if(isNaN(c)) return null; return {gain:v-c,pct:c>0?(v-c)/c*100:0}; }
+function savingsValTWD(x){ return toTWD(x.balance, x.currency||'TWD'); }
+function totalStock(){ return state.stock.reduce((s,x)=>s+stockVal(x),0); }
+function totalCrypto(){ return state.crypto.reduce((s,x)=>s+cryptoVal(x),0); }
+function totalGold(){ return state.gold.reduce((s,x)=>s+goldVal(x),0); }
+function totalSavings(){ return [...state.demand,...state.fixed].reduce((s,x)=>s+savingsValTWD(x),0); }
+function grandTotal(){ return totalStock()+totalCrypto()+totalGold()+totalSavings(); }
 
 // ══ Sync ══════════════════════════════════════════════════════
 let syncing=false;
 async function fetchRates(){
   try{
     const r=await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    if(!r.ok)throw 0;
+    if(!r.ok) throw 0;
     const d=await r.json();
     if(d.rates){
       state.usdTwd=d.rates.TWD||state.usdTwd;
       state.rates={USD:1,TWD:d.rates.TWD||32,AUD:d.rates.AUD||0.65,SGD:d.rates.SGD||0.75,CNY:d.rates.CNY||7.2};
     }
-  }catch(e){try{const r=await fetch('https://open.er-api.com/v6/latest/USD');if(r.ok){const d=await r.json();if(d.rates){state.usdTwd=d.rates.TWD||state.usdTwd;state.rates={USD:1,TWD:d.rates.TWD||32,AUD:d.rates.AUD||0.65,SGD:d.rates.SGD||0.75,CNY:d.rates.CNY||7.2};}}}catch(e2){}}
+  }catch(e){}
 }
 async function fetchGold(){
-  try{const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');if(!r.ok)throw 0;const d=await r.json();const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;if(p)state.xauUsd=p;}catch(e){}
+  try{
+    const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
+    if(p) state.xauUsd=p;
+  }catch(e){}
 }
 async function fetchCrypto(){
-  const coins=[...new Set(state.crypto.map(x=>x.coinId).filter(Boolean))];if(!coins.length)return;
+  const coins=[...new Set(state.crypto.map(x=>x.coinId).filter(Boolean))];
+  if(!coins.length) return;
   try{
     const r=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(',')}&vs_currencies=usd,twd`);
-    if(!r.ok)throw 0;const d=await r.json();
-    state.crypto=state.crypto.map(x=>{if(!x.coinId||!d[x.coinId])return x;return{...x,priceUsd:d[x.coinId].usd,priceTwd:d[x.coinId].twd||(d[x.coinId].usd*state.usdTwd)};});
+    if(!r.ok) throw 0;
+    const d=await r.json();
+    state.crypto=state.crypto.map(x=>{
+      if(!x.coinId||!d[x.coinId]) return x;
+      return {...x, priceUsd:d[x.coinId].usd, priceTwd:d[x.coinId].twd||(d[x.coinId].usd*state.usdTwd)};
+    });
   }catch(e){}
 }
 async function fetchStocks(){
@@ -478,38 +522,39 @@ async function fetchStocks(){
     try{
       const sym=t.includes('.')?t:t.match(/^\d+$/)?t+'.TW':t;
       const r=await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=1d`);
-      if(!r.ok)continue;const d=await r.json();
+      if(!r.ok) continue;
+      const d=await r.json();
       const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;
-      if(p)state.stock=state.stock.map(x=>x.ticker===t?{...x,price:parseFloat(p.toFixed(2))}:x);
+      if(p) state.stock=state.stock.map(x=>x.ticker===t?{...x,price:parseFloat(p.toFixed(2))}:x);
     }catch(e){}
   }
 }
 async function syncAll(){
-  if(syncing)return;syncing=true;
+  if(syncing) return;
+  syncing=true;
   document.querySelectorAll('.spin-target').forEach(e=>e.classList.add('spin'));
   showToast('正在更新…');
   try{
     await fetchRates();
     await Promise.all([fetchCrypto(),fetchStocks(),fetchGold()]);
-    const pg=goldPerGram();
+    const pg=goldPG();
     state.gold=state.gold.map(x=>({...x,pricePerGram:parseFloat(pg.toFixed(2))}));
     state.lastSync=new Date().toISOString();
-    save();renderAll();showToast('✓ 已更新');
-  }catch(e){showToast('部分更新失敗');}
+    save(); renderAll(); showToast('✓ 已更新');
+  }catch(e){ showToast('部分更新失敗'); }
   syncing=false;
   document.querySelectorAll('.spin-target').forEach(e=>e.classList.remove('spin'));
 }
-document.getElementById('sync-icon').classList.add('spin-target');
 
 // ══ PnL ══════════════════════════════════════════════════════
 function pnlHtml(pnl){
-  if(!pnl)return `<span class="pnl-na">未填成本</span>`;
+  if(!pnl) return `<span class="pnl-na">未填成本</span>`;
   const c=pnl.gain>=0?'pnl-up':'pnl-dn';
   return `<span class="${c}">${pnl.gain>=0?'+':''}${fmtTWD(pnl.gain)} (${pnl.pct>=0?'+':''}${pnl.pct.toFixed(1)}%)</span>`;
 }
 
-// ══ Crypto logo ═══════════════════════════════════════════════
-const LOGO_MAP={
+// ══ Crypto Logo ══════════════════════════════════════════════
+const LOGOS={
   bitcoin:'https://assets.coingecko.com/coins/images/1/small/bitcoin.png',
   ethereum:'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
   binancecoin:'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png',
@@ -532,192 +577,314 @@ const LOGO_MAP={
   arbitrum:'https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg',
   optimism:'https://assets.coingecko.com/coins/images/25244/small/Optimism.png',
   cosmos:'https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png',
-  filecoin:'https://assets.coingecko.com/coins/images/12817/small/filecoin.png',
-  'internet-computer':'https://assets.coingecko.com/coins/images/14495/small/Internet_Computer_logo.png',
 };
 function cryptoIcon(x){
-  const logo=LOGO_MAP[x.coinId];
-  if(logo)return `<img src="${logo}" onerror="this.parentElement.innerHTML='${(x.name||'?').slice(0,2)}'" />`;
+  const logo=LOGOS[x.coinId];
+  if(logo) return `<img src="${logo}" onerror="this.parentElement.innerHTML='${(x.name||'?').slice(0,2)}'" />`;
   return (x.name||'?').slice(0,2);
 }
 
 // ══ Render Home ══════════════════════════════════════════════
 function renderHome(){
-  const inv=totalInvest(),gld=totalGold(),dm=totalDemand(),fx=totalFixed(),grand=grandTotal();
-  document.getElementById('grand-total').textContent=fmtDisplay(grand).replace(curSym(),'');
-  document.getElementById('grand-sub').textContent=grand>0?`投資 ${Math.round(inv/grand*100)}% · 黃金 ${Math.round(gld/grand*100)}% · 存款 ${Math.round((dm+fx)/grand*100)}%`:'新增資產開始追蹤';
-  if(state.lastSync){const d=new Date(state.lastSync);document.getElementById('last-update').textContent=`更新於 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;}
-  document.getElementById('h-invest').textContent=fmtDisplay(inv);
-  document.getElementById('h-invest-sub').textContent=`${state.stock.length} 股 · ${state.crypto.length} 幣`;
+  const st=totalStock(),cr=totalCrypto(),gld=totalGold(),sv=totalSavings(),grand=grandTotal();
+  document.getElementById('grand-total').textContent = fmtDisplay(grand).replace(curSym(),'');
+  document.getElementById('grand-sub').textContent = grand>0
+    ? `股票 ${Math.round(st/grand*100)}% · 加密 ${Math.round(cr/grand*100)}% · 黃金 ${Math.round(gld/grand*100)}% · 存款 ${Math.round(sv/grand*100)}%`
+    : '新增資產開始追蹤';
+  if(state.lastSync){
+    const d=new Date(state.lastSync);
+    document.getElementById('last-update').textContent=`更新於 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+  }
+  document.getElementById('h-stock').textContent=fmtDisplay(st);
+  document.getElementById('h-stock-sub').textContent=state.stock.length+' 檔';
+  document.getElementById('h-crypto').textContent=fmtDisplay(cr);
+  document.getElementById('h-crypto-sub').textContent=state.crypto.length+' 種';
   document.getElementById('h-gold').textContent=fmtDisplay(gld);
   document.getElementById('h-gold-sub').textContent=state.gold.reduce((s,x)=>s+(parseFloat(x.grams)||0),0).toFixed(1)+' 克';
-  document.getElementById('h-demand').textContent=fmtDisplay(dm);
-  document.getElementById('h-demand-sub').textContent=state.demand.length+' 帳戶';
-  document.getElementById('h-fixed').textContent=fmtDisplay(fx);
-  document.getElementById('h-fixed-sub').textContent=state.fixed.length+' 筆';
+  document.getElementById('h-savings').textContent=fmtDisplay(sv);
+  document.getElementById('h-savings-sub').textContent=(state.demand.length+state.fixed.length)+' 帳戶';
   const bar=document.getElementById('alloc-bar');
   if(!grand){bar.innerHTML='';return;}
-  bar.innerHTML=[{v:inv,c:'var(--accent)'},{v:gld,c:'var(--gold)'},{v:dm,c:'var(--green)'},{v:fx,c:'var(--blue)'}]
+  bar.innerHTML=[{v:st,c:'var(--accent)'},{v:cr,c:'var(--amber)'},{v:gld,c:'var(--gold)'},{v:sv,c:'var(--green)'}]
     .map(x=>`<div class="alloc-seg" style="width:${(x.v/grand*100).toFixed(1)}%;background:${x.c}"></div>`).join('');
 }
 
-// ══ Render Invest ══════════════════════════════════════════════
+// ══ Render Invest ════════════════════════════════════════════
 function renderInvest(){
+  // Stock
   const sl=document.getElementById('stock-list');
   if(!state.stock.length){
-    sl.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持股<br>點擊右上角新增</div></div>';
+    sl.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持股<br>點右上角新增</div></div>';
     document.getElementById('stock-summary').textContent='';
-  }else{
+  } else {
     sl.innerHTML='<div class="list-wrap">'+state.stock.map((x,i)=>{
       const val=stockVal(x);
-      const badge=x.ticker?`<span class="item-badge"><span class="live-dot"></span>${x.ticker} ${fmtN(x.price)}</span>`:'';
-      return`<div class="list-item">
+      const badge=x.ticker?`<span class="item-badge"><span class="live-dot"></span>${x.ticker} ${x.price?fmtN(x.price):'待更新'}</span>`:'';
+      return `<div class="list-item">
         <div class="item-dot" style="background:#1e1a3a;color:#4dffd9">${(x.name||'?').slice(0,2)}</div>
-        <div class="item-body"><div class="item-name">${x.name||'—'}</div><div class="item-detail">${fmtN(x.shares)} 股 × ${fmtN(x.price)} TWD</div>${badge}</div>
-        <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div><div class="item-pnl">${pnlHtml(stockPnl(x))}</div></div>
-        <div class="act-row"><button class="act-icon-btn" onclick="openModal('stock',${i})">✎</button><button class="act-icon-btn del-btn" onclick="del('stock',${i})">×</button></div>
+        <div class="item-body"><div class="item-name">${x.name||'—'}</div>
+          <div class="item-detail">${fmtN(x.shares)} 股${x.price?` × ${fmtN(x.price)} TWD`:''}</div>${badge}</div>
+        <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div>
+          <div class="item-pnl">${pnlHtml(stockPnl(x))}</div></div>
+        <div class="act-row">
+          <button class="act-btn" onclick="openModal('stock',${i})">✎</button>
+          <button class="act-btn del-btn" onclick="del('stock',${i})">×</button>
+        </div>
       </div>`;
     }).join('')+'</div>';
     document.getElementById('stock-summary').textContent='股票總市值 '+fmtDisplay(totalStock());
   }
+  // Crypto
   const cl=document.getElementById('crypto-list');
   if(!state.crypto.length){
-    cl.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持幣<br>點擊右上角新增</div></div>';
+    cl.innerHTML='<div class="list-wrap"><div class="empty-state">尚無持幣<br>點右上角新增</div></div>';
     document.getElementById('crypto-summary').textContent='';
-  }else{
+  } else {
     cl.innerHTML='<div class="list-wrap">'+state.crypto.map((x,i)=>{
       const val=cryptoVal(x);
       const usdP=x.priceUsd?`$${x.priceUsd.toLocaleString('en-US',{maximumFractionDigits:2})} USD`:'';
       const badge=usdP?`<span class="item-badge"><span class="live-dot"></span>${usdP}</span>`:'';
-      return`<div class="list-item">
+      const twdP=x.priceTwd||(parseFloat(x.price)||0)*(x.currency==='USD'?state.usdTwd:1);
+      return `<div class="list-item">
         <div class="item-dot" style="background:#2a1f0a">${cryptoIcon(x)}</div>
-        <div class="item-body"><div class="item-name">${x.name||'—'}</div><div class="item-detail">${fmtN(x.amount)} 枚 × ${fmtTWD(x.priceTwd||(parseFloat(x.price)||0)*(x.currency==='USD'?state.usdTwd:1))}</div>${badge}</div>
-        <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div><div class="item-pnl">${pnlHtml(cryptoPnl(x))}</div></div>
-        <div class="act-row"><button class="act-icon-btn" onclick="openModal('crypto',${i})">✎</button><button class="act-icon-btn del-btn" onclick="del('crypto',${i})">×</button></div>
+        <div class="item-body"><div class="item-name">${x.name||'—'}</div>
+          <div class="item-detail">${fmtN(x.amount)} 枚${twdP?` × ${fmtTWD(twdP)}`:''}</div>${badge}</div>
+        <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div>
+          <div class="item-pnl">${pnlHtml(cryptoPnl(x))}</div></div>
+        <div class="act-row">
+          <button class="act-btn" onclick="openModal('crypto',${i})">✎</button>
+          <button class="act-btn del-btn" onclick="del('crypto',${i})">×</button>
+        </div>
       </div>`;
     }).join('')+'</div>';
     document.getElementById('crypto-summary').textContent=`加密總市值 ${fmtDisplay(totalCrypto())} · 1 USD = ${state.usdTwd.toFixed(2)} TWD`;
   }
 }
 
-// ══ Render Gold ═══════════════════════════════════════════════
+// ══ Render Gold ══════════════════════════════════════════════
 function renderGold(){
   const el=document.getElementById('gold-list');
-  const pg=goldPerGram();
+  const pg=goldPG();
   if(!state.gold.length){
     el.innerHTML=`<div class="list-wrap"><div class="empty-state">尚無黃金記錄<br>國際金價 $${state.xauUsd.toLocaleString()} USD/oz<br>≈ ${fmtTWD(pg)}/克</div></div>`;
-    document.getElementById('gold-summary').textContent='';return;
+    document.getElementById('gold-summary').textContent=''; return;
   }
   el.innerHTML='<div class="list-wrap">'+state.gold.map((x,i)=>{
-    const val=goldVal(x);const pgram=x.pricePerGram||pg;
-    return`<div class="list-item">
-      <div class="item-dot" style="background:#2a2000;color:#d4af37;font-size:18px">🥇</div>
-      <div class="item-body"><div class="item-name">${x.name||'黃金'}</div><div class="item-detail">${fmtN(x.grams)} 克 × ${fmtTWD(pgram)}/克</div><span class="item-badge"><span class="live-dot"></span>$${state.xauUsd.toLocaleString()} USD/oz</span></div>
-      <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div><div class="item-pnl">${pnlHtml(goldPnl(x))}</div></div>
-      <div class="act-row"><button class="act-icon-btn" onclick="openModal('gold',${i})">✎</button><button class="act-icon-btn del-btn" onclick="del('gold',${i})">×</button></div>
+    const val=goldVal(x), pgram=x.pricePerGram||pg;
+    return `<div class="list-item">
+      <div class="item-dot" style="background:#2a2000;font-size:16px">🥇</div>
+      <div class="item-body"><div class="item-name">${x.name||'黃金'}</div>
+        <div class="item-detail">${fmtN(x.grams)} 克 × ${fmtTWD(pgram)}/克</div>
+        <span class="item-badge"><span class="live-dot"></span>$${state.xauUsd.toLocaleString()} USD/oz</span></div>
+      <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div>
+        <div class="item-pnl">${pnlHtml(goldPnl(x))}</div></div>
+      <div class="act-row">
+        <button class="act-btn" onclick="openModal('gold',${i})">✎</button>
+        <button class="act-btn del-btn" onclick="del('gold',${i})">×</button>
+      </div>
     </div>`;
   }).join('')+'</div>';
   document.getElementById('gold-summary').textContent='黃金總值 '+fmtDisplay(totalGold());
 }
 
-// ══ Render Savings ════════════════════════════════════════════
+// ══ Render Savings ══════════════════════════════════════════
+function savingsCurBadge(x){
+  if(!x.currency||x.currency==='TWD') return '';
+  return ` <span style="font-size:9px;color:var(--accent);font-family:'DM Mono',monospace">${x.currency}</span>`;
+}
 function renderSavings(){
   const dm=document.getElementById('demand-list');
   const fx=document.getElementById('fixed-list');
   dm.innerHTML=state.demand.length?'<div class="list-wrap">'+state.demand.map((x,i)=>`
     <div class="list-item">
-      <div class="item-dot" style="background:#0a1f12;color:#22c55e;font-size:15px">活</div>
-      <div class="item-body"><div class="item-name">${x.name}</div><div class="item-detail">年利率 ${x.rate||0}%</div></div>
-      <div class="item-right"><div class="item-val">${fmtDisplay(x.balance)}</div></div>
-      <div class="act-row"><button class="act-icon-btn" onclick="openModal('demand',${i})">✎</button><button class="act-icon-btn del-btn" onclick="del('demand',${i})">×</button></div>
+      <div class="item-dot" style="background:#0a1f12;color:#22c55e">活</div>
+      <div class="item-body">
+        <div class="item-name">${x.name}${savingsCurBadge(x)}</div>
+        <div class="item-detail">年利率 ${x.rate||0}%${x.currency&&x.currency!=='TWD'?` · 原幣 ${fmtCur(x.balance,x.currency)}`:''}</div>
+      </div>
+      <div class="item-right"><div class="item-val">${fmtDisplay(savingsValTWD(x))}</div></div>
+      <div class="act-row"><button class="act-btn" onclick="openModal('demand',${i})">✎</button><button class="act-btn del-btn" onclick="del('demand',${i})">×</button></div>
     </div>`).join('')+'</div>'
     :'<div class="list-wrap"><div class="empty-state">尚無活存記錄</div></div>';
   fx.innerHTML=state.fixed.length?'<div class="list-wrap">'+state.fixed.map((x,i)=>`
     <div class="list-item">
-      <div class="item-dot" style="background:#0a1624;color:#38bdf8;font-size:15px">定</div>
-      <div class="item-body"><div class="item-name">${x.name}</div><div class="item-detail">利率 ${x.rate||0}% · 到期 ${x.maturity||'—'}</div></div>
-      <div class="item-right"><div class="item-val">${fmtDisplay(x.balance)}</div></div>
-      <div class="act-row"><button class="act-icon-btn" onclick="openModal('fixed',${i})">✎</button><button class="act-icon-btn del-btn" onclick="del('fixed',${i})">×</button></div>
+      <div class="item-dot" style="background:#0a1624;color:#38bdf8">定</div>
+      <div class="item-body">
+        <div class="item-name">${x.name}${savingsCurBadge(x)}</div>
+        <div class="item-detail">利率 ${x.rate||0}% · 到期 ${x.maturity||'—'}${x.currency&&x.currency!=='TWD'?` · ${fmtCur(x.balance,x.currency)}`:''}</div>
+      </div>
+      <div class="item-right"><div class="item-val">${fmtDisplay(savingsValTWD(x))}</div></div>
+      <div class="act-row"><button class="act-btn" onclick="openModal('fixed',${i})">✎</button><button class="act-btn del-btn" onclick="del('fixed',${i})">×</button></div>
     </div>`).join('')+'</div>'
     :'<div class="list-wrap"><div class="empty-state">尚無定存記錄</div></div>';
 }
 
 // ══ Ledger ═══════════════════════════════════════════════════
-let calY=new Date().getFullYear(),calM=new Date().getMonth(),selDate=null;
+let calY=new Date().getFullYear(), calM=new Date().getMonth(), selDate=null, ledgerView='month';
 const CATS=[{e:'🍜',n:'餐飲'},{e:'🚌',n:'交通'},{e:'🛍',n:'購物'},{e:'🎮',n:'娛樂'},{e:'🏥',n:'醫療'},{e:'🏠',n:'居住'},{e:'💼',n:'薪資'},{e:'💰',n:'收益'},{e:'📦',n:'其他'}];
 const cKey=(y,m,d)=>`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const todayKey=()=>{const n=new Date();return cKey(n.getFullYear(),n.getMonth(),n.getDate());};
 
+function setLedgerView(v){
+  ledgerView=v;
+  document.querySelectorAll('.vt-opt').forEach(e=>e.classList.remove('active'));
+  document.getElementById('vt-'+v).classList.add('active');
+  renderLedger();
+}
+
+function getMonthRange(){
+  if(ledgerView==='month') return [{y:calY,m:calM}];
+  const now=new Date(); let y=now.getFullYear(),m=now.getMonth();
+  const months=[];
+  const count=ledgerView==='half'?6:12;
+  for(let i=0;i<count;i++){
+    months.unshift({y,m});
+    m--; if(m<0){m=11;y--;}
+  }
+  return months;
+}
+
+function calcPeriodTotals(){
+  const range=getMonthRange();
+  const prefixes=range.map(({y,m})=>`${y}-${String(m+1).padStart(2,'0')}`);
+  let inc=0,exp=0;
+  // Fixed items (monthly) — count per month in range
+  state.fixedItems.forEach(fi=>{
+    const amt=parseFloat(fi.amount)||0;
+    let months=range.length;
+    if(fi.freq==='yearly') months=Math.max(1,Math.round(range.length/12));
+    else if(fi.freq==='halfyearly') months=Math.max(1,Math.round(range.length/6));
+    if(fi.type==='income') inc+=amt*months;
+    else exp+=amt*months;
+  });
+  Object.entries(state.entries).forEach(([k,es])=>{
+    if(!prefixes.some(p=>k.startsWith(p))) return;
+    es.forEach(e=>{
+      const amt=toTWD(parseFloat(e.amount)||0, e.currency||'TWD');
+      if(e.type==='income') inc+=amt; else exp+=amt;
+    });
+  });
+  return {inc,exp,net:inc-exp};
+}
+
 function renderLedger(){
   const mN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-  document.getElementById('cal-month-label').textContent=`${calY} 年 ${mN[calM]}`;
-  const firstDay=new Date(calY,calM,1).getDay();
-  const dim=new Date(calY,calM+1,0).getDate();
-  const todayK=todayKey();
-  let h='';
-  ['日','一','二','三','四','五','六'].forEach(d=>h+=`<div class="cal-dow">${d}</div>`);
-  for(let i=0;i<firstDay;i++)h+=`<div class="cal-day empty-day"></div>`;
-  for(let d=1;d<=dim;d++){
-    const k=cKey(calY,calM,d);
-    const isT=k===todayK,isS=k===selDate,hasE=(state.entries[k]||[]).length>0;
-    h+=`<div class="cal-day${isT?' today':''}${isS?' selected':''}${hasE?' has-entry':''}" onclick="selDay('${k}')">${d}</div>`;
+  const calWrap=document.getElementById('ledger-cal-wrap');
+  const periodWrap=document.getElementById('period-summary-wrap');
+
+  if(ledgerView==='month'){
+    document.getElementById('cal-month-label').textContent=`${calY} 年 ${mN[calM]}`;
+    calWrap.style.display='';
+    periodWrap.innerHTML='';
+    // Build calendar
+    const firstDay=new Date(calY,calM,1).getDay();
+    const dim=new Date(calY,calM+1,0).getDate();
+    const todK=todayKey();
+    let h='';
+    ['日','一','二','三','四','五','六'].forEach(d=>h+=`<div class="cal-dow">${d}</div>`);
+    for(let i=0;i<firstDay;i++) h+=`<div class="cal-day empty-day"></div>`;
+    for(let d=1;d<=dim;d++){
+      const k=cKey(calY,calM,d);
+      const isT=k===todK,isS=k===selDate,hasE=(state.entries[k]||[]).length>0;
+      h+=`<div class="cal-day${isT?' today':''}${isS?' selected':''}${hasE?' has-entry':''}" onclick="selDay('${k}')">${d}</div>`;
+    }
+    document.getElementById('cal-grid').innerHTML=h;
+  } else {
+    document.getElementById('cal-month-label').textContent=ledgerView==='half'?'近半年':'今年';
+    calWrap.style.display='none';
+    selDate=null;
+    // Period breakdown by month
+    const range=getMonthRange();
+    let rows='<div class="period-summary">';
+    range.forEach(({y,m})=>{
+      const prefix=`${y}-${String(m+1).padStart(2,'0')}`;
+      let inc=0,exp=0;
+      state.fixedItems.forEach(fi=>{
+        const a=parseFloat(fi.amount)||0;
+        if(fi.type==='income') inc+=a; else exp+=a;
+      });
+      Object.entries(state.entries).forEach(([k,es])=>{
+        if(!k.startsWith(prefix)) return;
+        es.forEach(e=>{
+          const a=toTWD(parseFloat(e.amount)||0,e.currency||'TWD');
+          if(e.type==='income') inc+=a; else exp+=a;
+        });
+      });
+      const net=inc-exp;
+      rows+=`<div class="period-bar-wrap">
+        <div class="period-bar-label"><span>${mN[m]}</span><span style="color:${net>=0?'var(--green)':'var(--red)'}">結餘 ${fmtTWD(net)}</span></div>
+        <div style="display:flex;gap:3px">
+          <div class="period-bar-track" style="flex:1"><div class="period-bar-fill" style="width:${inc>0?Math.min(100,inc/(inc+exp)*100):0}%;background:var(--green)"></div></div>
+          <div class="period-bar-track" style="flex:1"><div class="period-bar-fill" style="width:${exp>0?Math.min(100,exp/(inc+exp)*100):0}%;background:var(--red)"></div></div>
+        </div>
+      </div>`;
+    });
+    periodWrap.innerHTML=rows+'</div>';
   }
-  document.getElementById('cal-grid').innerHTML=h;
-  // Monthly totals
-  let inc=0,exp=0;
-  const prefix=`${calY}-${String(calM+1).padStart(2,'0')}`;
-  state.fixedItems.forEach(fi=>{fi.type==='income'?inc+=parseFloat(fi.amount)||0:exp+=parseFloat(fi.amount)||0;});
-  Object.entries(state.entries).forEach(([k,es])=>{
-    if(!k.startsWith(prefix))return;
-    es.forEach(e=>{e.type==='income'?inc+=parseFloat(e.amount)||0:exp+=parseFloat(e.amount)||0;});
-  });
-  const net=inc-exp;
+
+  // Summary
+  const {inc,exp,net}=calcPeriodTotals();
   document.getElementById('lv-income').textContent=fmtTWD(inc);
   document.getElementById('lv-expense').textContent=fmtTWD(exp);
-  const nel=document.getElementById('lv-net');nel.textContent=fmtTWD(net);
+  const nel=document.getElementById('lv-net');
+  nel.textContent=fmtTWD(net);
   nel.className='lcard-val '+(net>=0?'lv-pos':'lv-neg');
-  renderDayDetail();renderFixedItems();
+  renderDayDetail();
+  renderFixedItems();
 }
+
 function renderDayDetail(){
   const dd=document.getElementById('day-detail');
   if(!selDate){dd.innerHTML='';return;}
   const es=state.entries[selDate]||[];
   const [,m,d]=selDate.split('-');
-  let h=`<div class="day-detail-title">${parseInt(m)}月${parseInt(d)}日</div>`;
-  if(!es.length)h+=`<div style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;text-align:center;padding:12px">無記錄 · 點右上角新增</div>`;
+  let h=`<div class="day-title">${parseInt(m)}月${parseInt(d)}日</div>`;
+  if(!es.length) h+=`<div style="font-size:12px;color:var(--text3);text-align:center;padding:10px;font-family:'DM Mono',monospace">無記錄</div>`;
   else es.forEach((e,i)=>{
     const cat=CATS.find(c=>c.n===e.cat)||CATS[CATS.length-1];
+    const amtTWD=toTWD(parseFloat(e.amount)||0,e.currency||'TWD');
+    const linked=e.linkedAccountIdx!=null?`<span class="linked-badge">→ ${(e.type==='income'?state.demand:state.demand)[e.linkedAccountIdx]?.name||'帳戶'}</span>`:'';
     h+=`<div class="entry-item">
       <span class="entry-cat">${cat.e}</span>
-      <div class="entry-body"><div class="entry-name">${e.name||e.cat}</div></div>
+      <div class="entry-body">
+        <div class="entry-name">${e.name||e.cat}</div>
+        <div class="entry-sub">${e.currency&&e.currency!=='TWD'?fmtCur(e.amount,e.currency)+' → ':''}</div>
+        ${linked}
+      </div>
       <span class="entry-amt" style="color:${e.type==='income'?'var(--green)':'var(--red)'}">
-        ${e.type==='income'?'+':'-'}${fmtTWD(e.amount)}</span>
-      <button class="act-icon-btn del-btn" onclick="delEntry('${selDate}',${i})" style="margin-left:6px">×</button>
+        ${e.type==='income'?'+':'-'}${fmtTWD(amtTWD)}</span>
+      <button class="act-btn del-btn" onclick="delEntry('${selDate}',${i})" style="margin-left:5px">×</button>
     </div>`;
   });
   dd.innerHTML=h;
 }
+
 function renderFixedItems(){
   const el=document.getElementById('fixed-items-section');
   if(!state.fixedItems.length){el.innerHTML='';return;}
-  let h=`<div class="fixed-section-title">每月固定項目</div><div class="list-wrap">`;
+  const freqLabel={monthly:'每月',halfyearly:'每半年',yearly:'每年'};
+  let h=`<div class="fixed-title">固定項目</div><div class="list-wrap">`;
   state.fixedItems.forEach((fi,i)=>{
     const cat=CATS.find(c=>c.n===fi.cat)||CATS[CATS.length-1];
     h+=`<div class="list-item">
-      <span style="font-size:18px">${cat.e}</span>
-      <div class="item-body"><div class="item-name">${fi.name}</div><div class="item-detail">${fi.type==='income'?'固定收入':'固定支出'}</div></div>
+      <span style="font-size:16px">${cat.e}</span>
+      <div class="item-body">
+        <div class="item-name">${fi.name}</div>
+        <div class="item-detail">${freqLabel[fi.freq||'monthly']}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}</div>
+      </div>
       <div class="item-right"><div class="item-val" style="color:${fi.type==='income'?'var(--green)':'var(--red)'}">
         ${fi.type==='income'?'+':'-'}${fmtTWD(fi.amount)}</div></div>
-      <div class="act-row"><button class="act-icon-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
+      <div class="act-row"><button class="act-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
     </div>`;
   });
   el.innerHTML=h+'</div>';
 }
-function selDay(k){selDate=selDate===k?null:k;renderLedger();}
-function calPrev(){calM--;if(calM<0){calM=11;calY--;}renderLedger();}
-function calNext(){calM++;if(calM>11){calM=0;calY++;}renderLedger();}
-function delEntry(k,i){state.entries[k].splice(i,1);if(!state.entries[k].length)delete state.entries[k];save();renderLedger();}
-function delFixedItem(i){state.fixedItems.splice(i,1);save();renderLedger();}
+
+function selDay(k){ selDate=selDate===k?null:k; renderLedger(); }
+function calPrev(){ calM--; if(calM<0){calM=11;calY--;} renderLedger(); }
+function calNext(){ calM++; if(calM>11){calM=0;calY++;} renderLedger(); }
+function delEntry(k,i){ state.entries[k].splice(i,1); if(!state.entries[k].length) delete state.entries[k]; save(); renderLedger(); }
+function delFixedItem(i){ state.fixedItems.splice(i,1); save(); renderLedger(); }
 
 // ══ Modal ═════════════════════════════════════════════════════
 const COINS=[
@@ -731,26 +898,32 @@ const COINS=[
   {label:'Sui (SUI)',id:'sui'},{label:'TON',id:'the-open-network'},
   {label:'Shiba Inu (SHIB)',id:'shiba-inu'},{label:'Pepe (PEPE)',id:'pepe'},
   {label:'Arbitrum (ARB)',id:'arbitrum'},{label:'Optimism (OP)',id:'optimism'},
-  {label:'Uniswap (UNI)',id:'uniswap'},{label:'Filecoin (FIL)',id:'filecoin'},
-  {label:'其他（手動）',id:''}
+  {label:'Uniswap (UNI)',id:'uniswap'},{label:'其他（手動）',id:''}
 ];
-let modalType=null,editIdx=-1;
+let modalType=null, editIdx=-1;
+
+const v=id=>{const el=document.getElementById('f-'+id);return el?el.value.trim():'';};
+const curOptions=()=>CURRENCIES.map(c=>`<option value="${c.code}">${c.sym} ${c.code} ${c.name}</option>`).join('');
+const demandOptions=()=>{
+  if(!state.demand.length) return '<option value="">（無活存帳戶）</option>';
+  return '<option value="">不連結帳戶</option>'+state.demand.map((d,i)=>`<option value="${i}">${d.name}</option>`).join('');
+};
 
 function openModal(type,idx=-1){
-  modalType=type;editIdx=idx;
+  modalType=type; editIdx=idx;
   const isEdit=idx>=0;
   const item=isEdit?(state[type]?.[idx]||null):null;
-  const T={stock:'股票',crypto:'加密貨幣',gold:'黃金',demand:'台幣活存',fixed:'台幣定存',entry:'記帳','fixed-item':'固定項目'};
+  const T={stock:'股票',crypto:'加密貨幣',gold:'黃金',demand:'活存帳戶',fixed:'定存帳戶',
+    entry:'記帳','fixed-item':'固定項目','savings-new':'新增存款帳戶'};
   document.getElementById('modal-title').textContent=(isEdit?'編輯':'新增')+(T[type]||'');
   const body=document.getElementById('modal-body');
 
   if(type==='stock'){
     body.innerHTML=`
       <div class="field"><div class="field-label">股票名稱</div><input class="field-input" id="f-name" placeholder="例：台積電" value="${item?.name||''}"/></div>
-      <div class="field"><div class="field-label">股票代號（自動更新用）</div><input class="field-input" id="f-ticker" placeholder="台股：2330　美股：AAPL" value="${item?.ticker||''}" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="field"><div class="field-label">股票代號（自動抓取市場價格）</div><input class="field-input" id="f-ticker" placeholder="台股：2330　美股：AAPL" value="${item?.ticker||''}" oninput="this.value=this.value.toUpperCase()"/></div>
       <div class="field"><div class="field-label">持有股數</div><input class="field-input" id="f-shares" type="number" placeholder="1000" value="${item?.shares||''}"/></div>
-      <div class="field"><div class="field-label">現價 TWD（填代號後可自動更新）</div><input class="field-input" id="f-price" type="number" placeholder="820" value="${item?.price||''}"/></div>
-      <div class="field"><div class="field-label">總成本 TWD（選填） — 填 App 顯示的總成本</div><input class="field-input" id="f-totalCost" type="number" placeholder="你的股票 App 顯示的總成本" value="${item?.totalCost??''}"/></div>
+      <div class="field"><div class="field-label">總成本 TWD（選填，計算損益）</div><input class="field-input" id="f-totalCost" type="number" placeholder="填你股票 App 顯示的總成本" value="${item?.totalCost??''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='crypto'){
@@ -758,11 +931,11 @@ function openModal(type,idx=-1){
     body.innerHTML=`
       <div class="field"><div class="field-label">選擇幣種</div>
         <select class="field-select" id="f-coinSel" onchange="onCoinSel(this.value)">
-          ${COINS.map(c=>`<option value="${c.id}" ${c.id===ci?'selected':''}>${c.label}</option>`).join('')}
+          ${COINS.map(c=>`<option value="${c.id}"${c.id===ci?' selected':''}>${c.label}</option>`).join('')}
         </select>
       </div>
-      <div id="f-other-wrap" style="display:${!ci||!COINS.find(c=>c.id===ci&&c.id!=='')?'block':'none'}">
-        <div class="field"><div class="field-label">幣種名稱（手動填入）</div><input class="field-input" id="f-name" placeholder="例：MyToken" value="${item?.name||''}"/></div>
+      <div id="f-other-wrap" style="display:${!ci?'block':'none'}">
+        <div class="field"><div class="field-label">幣種名稱</div><input class="field-input" id="f-name" placeholder="例：MyToken" value="${item?.name||''}"/></div>
       </div>
       <div class="field"><div class="field-label">持有數量</div><input class="field-input" id="f-amount" type="number" placeholder="0.5" value="${item?.amount||''}"/></div>
       <div class="field"><div class="field-label">總成本 TWD（選填）</div><input class="field-input" id="f-totalCost" type="number" placeholder="買入總花費（TWD）" value="${item?.totalCost??''}"/></div>
@@ -770,7 +943,7 @@ function openModal(type,idx=-1){
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='gold'){
-    const pg=goldPerGram();
+    const pg=goldPG();
     body.innerHTML=`
       <div class="field"><div class="field-label">名稱（選填）</div><input class="field-input" id="f-name" placeholder="例：台銀黃金存摺" value="${item?.name||''}"/></div>
       <div class="field"><div class="field-label">持有克數</div><input class="field-input" id="f-grams" type="number" placeholder="10.5" value="${item?.grams||''}"/></div>
@@ -778,19 +951,40 @@ function openModal(type,idx=-1){
       <div class="hint">國際金價 $${state.xauUsd.toLocaleString()} USD/oz · 每克 ≈ ${fmtTWD(pg)}</div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
+  else if(type==='savings-new'){
+    body.innerHTML=`
+      <div class="field"><div class="field-label">類型</div>
+        <div class="radio-group">
+          <label class="radio-opt"><input type="radio" name="stype" value="demand" checked><span>活期</span></label>
+          <label class="radio-opt"><input type="radio" name="stype" value="fixed"><span>定期</span></label>
+        </div>
+      </div>
+      <div class="field"><div class="field-label">銀行 / 帳戶名稱</div><input class="field-input" id="f-name" placeholder="例：台灣銀行活存"/></div>
+      <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-currency">${curOptions()}</select></div>
+      <div class="field"><div class="field-label">餘額</div><input class="field-input" id="f-balance" type="number" placeholder="500000"/></div>
+      <div class="field"><div class="field-label">年利率 %（選填）</div><input class="field-input" id="f-rate" type="number" placeholder="0.8"/></div>
+      <div id="f-maturity-wrap" style="display:none">
+        <div class="field"><div class="field-label">到期日</div><input class="field-input" id="f-maturity" type="date"/></div>
+      </div>
+      <button class="save-btn" onclick="saveModal()">儲存</button>`;
+    document.querySelector('input[name="stype"][value="demand"]').addEventListener('change',()=>{document.getElementById('f-maturity-wrap').style.display='none';});
+    document.querySelector('input[name="stype"][value="fixed"]').addEventListener('change',()=>{document.getElementById('f-maturity-wrap').style.display='';});
+  }
   else if(type==='demand'){
     body.innerHTML=`
-      <div class="field"><div class="field-label">銀行 / 帳戶名稱</div><input class="field-input" id="f-name" placeholder="例：台灣銀行活存" value="${item?.name||''}"/></div>
-      <div class="field"><div class="field-label">目前餘額 TWD</div><input class="field-input" id="f-balance" type="number" placeholder="500000" value="${item?.balance||''}"/></div>
-      <div class="field"><div class="field-label">年利率 %（選填）</div><input class="field-input" id="f-rate" type="number" placeholder="0.8" value="${item?.rate||''}"/></div>
+      <div class="field"><div class="field-label">帳戶名稱</div><input class="field-input" id="f-name" placeholder="例：台灣銀行活存" value="${item?.name||''}"/></div>
+      <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-currency">${CURRENCIES.map(c=>`<option value="${c.code}"${(item?.currency||'TWD')===c.code?' selected':''}>${c.sym} ${c.code} ${c.name}</option>`).join('')}</select></div>
+      <div class="field"><div class="field-label">餘額</div><input class="field-input" id="f-balance" type="number" value="${item?.balance||''}"/></div>
+      <div class="field"><div class="field-label">年利率 %（選填）</div><input class="field-input" id="f-rate" type="number" value="${item?.rate||''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='fixed'){
     body.innerHTML=`
-      <div class="field"><div class="field-label">銀行 / 方案名稱</div><input class="field-input" id="f-name" placeholder="例：郵局一年定存" value="${item?.name||''}"/></div>
-      <div class="field"><div class="field-label">本金 TWD</div><input class="field-input" id="f-balance" type="number" placeholder="1000000" value="${item?.balance||''}"/></div>
+      <div class="field"><div class="field-label">帳戶名稱</div><input class="field-input" id="f-name" value="${item?.name||''}"/></div>
+      <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-currency">${CURRENCIES.map(c=>`<option value="${c.code}"${(item?.currency||'TWD')===c.code?' selected':''}>${c.sym} ${c.code} ${c.name}</option>`).join('')}</select></div>
+      <div class="field"><div class="field-label">本金</div><input class="field-input" id="f-balance" type="number" value="${item?.balance||''}"/></div>
       <div class="field-row">
-        <div class="field"><div class="field-label">年利率 %</div><input class="field-input" id="f-rate" type="number" placeholder="1.5" value="${item?.rate||''}"/></div>
+        <div class="field"><div class="field-label">年利率 %</div><input class="field-input" id="f-rate" type="number" value="${item?.rate||''}"/></div>
         <div class="field"><div class="field-label">到期日</div><input class="field-input" id="f-maturity" type="date" value="${item?.maturity||''}"/></div>
       </div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
@@ -806,8 +1000,14 @@ function openModal(type,idx=-1){
       </div>
       <div class="field"><div class="field-label">類別</div><select class="field-select" id="f-cat">${CATS.map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}</select></div>
       <div class="field"><div class="field-label">名稱（選填）</div><input class="field-input" id="f-name" placeholder="例：午餐、薪水"/></div>
-      <div class="field"><div class="field-label">金額 TWD</div><input class="field-input" id="f-amount" type="number" placeholder="150"/></div>
+      <div class="field-row">
+        <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-currency">${curOptions()}</select></div>
+        <div class="field"><div class="field-label">金額</div><input class="field-input" id="f-amount" type="number" placeholder="150"/></div>
+      </div>
       <div class="field"><div class="field-label">日期</div><input class="field-input" id="f-date" type="date" value="${def}"/></div>
+      <div class="field"><div class="field-label">連結活存帳戶（自動增減餘額）</div>
+        <select class="field-select" id="f-linked">${demandOptions()}</select>
+      </div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='fixed-item'){
@@ -819,103 +1019,131 @@ function openModal(type,idx=-1){
         </div>
       </div>
       <div class="field"><div class="field-label">類別</div><select class="field-select" id="f-cat">${CATS.map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}</select></div>
-      <div class="field"><div class="field-label">名稱</div><input class="field-input" id="f-name" placeholder="例：薪資、房租、保險"/></div>
-      <div class="field"><div class="field-label">每月金額 TWD</div><input class="field-input" id="f-amount" type="number" placeholder="50000"/></div>
+      <div class="field"><div class="field-label">名稱</div><input class="field-input" id="f-name" placeholder="例：薪資、房租"/></div>
+      <div class="field"><div class="field-label">金額 TWD</div><input class="field-input" id="f-amount" type="number" placeholder="50000"/></div>
+      <div class="field"><div class="field-label">頻率</div>
+        <select class="field-select" id="f-freq">
+          <option value="monthly">每月</option>
+          <option value="halfyearly">每半年</option>
+          <option value="yearly">每年</option>
+        </select>
+      </div>
+      <div class="field"><div class="field-label">幾號（選填，例如每月5號）</div>
+        <input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31"/>
+      </div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(()=>document.querySelector('#modal-body input,#modal-body select')?.focus(),350);
 }
 
-function onCoinSel(v){document.getElementById('f-other-wrap').style.display=!v?'block':'none';}
-
-function v(id){const el=document.getElementById('f-'+id);return el?el.value.trim():'';}
+function onCoinSel(v){ document.getElementById('f-other-wrap').style.display=!v?'block':'none'; }
 
 function saveModal(){
-  const type=modalType;let obj={};
+  const type=modalType; let obj={};
   if(type==='stock'){
-    const name=v('name'),ticker=v('ticker'),shares=parseFloat(v('shares')),price=parseFloat(v('price')),tc=v('totalCost');
+    const name=v('name'),ticker=v('ticker'),shares=parseFloat(v('shares')),tc=v('totalCost');
     if(!name||isNaN(shares)){showToast('請填寫名稱和股數');return;}
-    obj={name,ticker:ticker.toUpperCase(),shares,price:isNaN(price)?0:price,totalCost:tc!==''?parseFloat(tc):undefined};
+    obj={name,ticker:ticker.toUpperCase(),shares,price:0,totalCost:tc!==''?parseFloat(tc):undefined};
   }
   else if(type==='crypto'){
-    const coinId=v('coinSel')||document.getElementById('f-coinSel')?.value||'';
+    const coinId=document.getElementById('f-coinSel')?.value||'';
     const isOther=!coinId;
-    const nameFromSel=COINS.find(c=>c.id===coinId)?.label.split(' (')[0]||coinId;
+    const nameFromSel=COINS.find(c=>c.id===coinId&&coinId)?.label.split(' (')[0]||'';
     const name=isOther?v('name'):nameFromSel;
-    const amount=parseFloat(v('amount'));const tc=v('totalCost');
-    if(!name||isNaN(amount)){showToast('請填寫幣種和數量');return;}
+    const amount=parseFloat(v('amount')),tc=v('totalCost');
+    if(!name||isNaN(amount)){showToast('請選擇幣種和數量');return;}
     const ex=editIdx>=0?state.crypto[editIdx]:{};
-    obj={name,coinId,amount,price:'',currency:'USD',totalCost:tc!==''?parseFloat(tc):undefined,priceUsd:ex.priceUsd||0,priceTwd:ex.priceTwd||0};
+    obj={name,coinId,amount,price:'',currency:'USD',totalCost:tc!==''?parseFloat(tc):undefined,
+      priceUsd:ex.priceUsd||0,priceTwd:ex.priceTwd||0};
   }
   else if(type==='gold'){
-    const grams=parseFloat(v('grams'));const tc=v('totalCost');
+    const grams=parseFloat(v('grams')),tc=v('totalCost');
     if(isNaN(grams)||grams<=0){showToast('請填寫克數');return;}
-    obj={name:v('name')||'黃金',grams,pricePerGram:parseFloat(goldPerGram().toFixed(2)),totalCost:tc!==''?parseFloat(tc):undefined};
+    obj={name:v('name')||'黃金',grams,pricePerGram:parseFloat(goldPG().toFixed(2)),totalCost:tc!==''?parseFloat(tc):undefined};
+  }
+  else if(type==='savings-new'){
+    const stype=document.querySelector('input[name="stype"]:checked')?.value||'demand';
+    const name=v('name'),bal=parseFloat(v('balance')),cur=v('currency')||'TWD',rate=v('rate'),mat=v('maturity');
+    if(!name||isNaN(bal)){showToast('請填寫名稱和餘額');return;}
+    obj={name,balance:bal,currency:cur,rate:rate?parseFloat(rate):0,maturity:mat};
+    state[stype].push(obj); save(); closeModal(); renderSavings(); renderHome(); return;
   }
   else if(type==='demand'){
-    const name=v('name'),bal=parseFloat(v('balance')),rate=v('rate');
+    const name=v('name'),bal=parseFloat(v('balance')),cur=v('currency')||'TWD',rate=v('rate');
     if(!name||isNaN(bal)){showToast('請填寫必要欄位');return;}
-    obj={name,balance:bal,rate:rate?parseFloat(rate):0};
+    obj={name,balance:bal,currency:cur,rate:rate?parseFloat(rate):0};
   }
   else if(type==='fixed'){
-    const name=v('name'),bal=parseFloat(v('balance')),rate=v('rate'),mat=v('maturity');
+    const name=v('name'),bal=parseFloat(v('balance')),cur=v('currency')||'TWD',rate=v('rate'),mat=v('maturity');
     if(!name||isNaN(bal)){showToast('請填寫必要欄位');return;}
-    obj={name,balance:bal,rate:rate?parseFloat(rate):0,maturity:mat};
+    obj={name,balance:bal,currency:cur,rate:rate?parseFloat(rate):0,maturity:mat};
   }
   else if(type==='entry'){
     const etype=document.querySelector('input[name="etype"]:checked')?.value||'expense';
-    const cat=v('cat'),name=v('name'),amount=parseFloat(v('amount')),date=v('date');
+    const cat=v('cat'),name=v('name'),cur=v('currency')||'TWD',amount=parseFloat(v('amount')),date=v('date');
+    const linkedVal=v('linked');
+    const linkedIdx=linkedVal!==''?parseInt(linkedVal):null;
     if(isNaN(amount)||amount<=0){showToast('請填寫金額');return;}
     if(!date){showToast('請選擇日期');return;}
-    if(!state.entries[date])state.entries[date]=[];
-    state.entries[date].push({type:etype,cat,name,amount});
-    if(!selDate)selDate=date;
-    save();closeModal();renderLedger();return;
+    const amtTWD=toTWD(amount,cur);
+    // Link to savings account
+    if(linkedIdx!=null&&state.demand[linkedIdx]){
+      const acc=state.demand[linkedIdx];
+      const accTWD=toTWD(parseFloat(acc.balance)||0,acc.currency||'TWD');
+      const newTWD=etype==='income'?accTWD+amtTWD:accTWD-amtTWD;
+      acc.balance=parseFloat((newTWD/(state.usdTwd/(state.rates[acc.currency||'TWD']||state.usdTwd))).toFixed(2));
+      if(acc.currency==='TWD'||!acc.currency) acc.balance=Math.round(newTWD);
+    }
+    if(!state.entries[date]) state.entries[date]=[];
+    state.entries[date].push({type:etype,cat,name,amount,currency:cur,linkedAccountIdx:linkedIdx});
+    if(!selDate) selDate=date;
+    save(); closeModal(); renderLedger(); renderSavings(); renderHome(); return;
   }
   else if(type==='fixed-item'){
     const fitype=document.querySelector('input[name="fitype"]:checked')?.value||'expense';
-    const cat=v('cat'),name=v('name'),amount=parseFloat(v('amount'));
+    const cat=v('cat'),name=v('name'),amount=parseFloat(v('amount')),freq=v('freq')||'monthly',day=v('day');
     if(!name||isNaN(amount)||amount<=0){showToast('請填寫名稱和金額');return;}
-    state.fixedItems.push({type:fitype,cat,name,amount});
-    save();closeModal();renderLedger();return;
+    state.fixedItems.push({type:fitype,cat,name,amount,freq,day:day?parseInt(day):null});
+    save(); closeModal(); renderLedger(); return;
   }
   const arr=state[type];
   if(arr){
-    if(editIdx>=0)arr[editIdx]=obj;else arr.push(obj);
-    save();closeModal();renderAll();
-    if(type==='crypto'&&obj.coinId)setTimeout(()=>fetchCrypto().then(()=>{save();renderInvest();renderHome();}),400);
+    if(editIdx>=0) arr[editIdx]=obj; else arr.push(obj);
+    save(); closeModal(); renderAll();
+    if(type==='crypto'&&obj.coinId) setTimeout(()=>fetchCrypto().then(()=>{save();renderInvest();renderHome();}),400);
+    if(type==='stock'&&obj.ticker) setTimeout(()=>fetchStocks().then(()=>{save();renderInvest();renderHome();}),400);
   }
 }
 
-function del(type,idx){if(!confirm('確定刪除？'))return;state[type].splice(idx,1);save();renderAll();}
-function closeModal(){document.getElementById('modal-overlay').classList.remove('open');modalType=null;editIdx=-1;}
-function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+function del(type,idx){ if(!confirm('確定刪除？')) return; state[type].splice(idx,1); save(); renderAll(); }
+function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); modalType=null; editIdx=-1; }
+function closeModalOutside(e){ if(e.target===document.getElementById('modal-overlay')) closeModal(); }
 
-// ══ Navigation ════════════════════════════════════════════════
+// ══ Navigation ═══════════════════════════════════════════════
 function switchPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
   document.getElementById('tab-'+page)?.classList.add('active');
-  if(page==='home')renderHome();
-  if(page==='invest')renderInvest();
-  if(page==='gold')renderGold();
-  if(page==='savings')renderSavings();
-  if(page==='ledger')renderLedger();
+  if(page==='home') renderHome();
+  if(page==='invest') renderInvest();
+  if(page==='gold') renderGold();
+  if(page==='savings') renderSavings();
+  if(page==='ledger') renderLedger();
 }
 
-// ══ Toast ═════════════════════════════════════════════════════
+// ══ Toast ═══════════════════════════════════════════════════
 let toastT;
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2500);}
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2500); }
 
-// ══ Service Worker ════════════════════════════════════════════
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
+// ══ Service Worker ══════════════════════════════════════════
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
-// ══ Init ══════════════════════════════════════════════════════
-function renderAll(){renderHome();renderInvest();renderGold();renderSavings();}
-renderAll();renderLedger();
-if(state.stock.length||state.crypto.length||state.gold.length)setTimeout(syncAll,1200);
+// ══ Init ════════════════════════════════════════════════════
+function renderAll(){ renderHome(); renderInvest(); renderGold(); renderSavings(); }
+renderAll(); renderLedger();
+if(state.stock.length||state.crypto.length||state.gold.length) setTimeout(syncAll,1000);
 </script>
 </body>
 </html>
