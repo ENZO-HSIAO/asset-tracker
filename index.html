@@ -94,7 +94,7 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 .empty-state{text-align:center;padding:24px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
 .summary-row{text-align:right;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:6px}
 
-/* Tab bar — 5 items with center news button */
+/* Tab bar */
 .tab-bar{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:430px;background:var(--bg1);border-top:1px solid var(--border);
@@ -109,11 +109,13 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 
 /* Center news button */
 .tab-news-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;padding:4px 4px 6px;position:relative}
-.tab-news-circle{width:35px;height:35px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;overflow:hidden;position:absolute;top:-30px;transition:transform .15s}
+.tab-news-circle{width:35px;height:35px;border-radius:50%;background:transparent;border:none;display:flex;align-items:center;justify-content:center;overflow:hidden;position:absolute;top:-20px;transition:transform .15s}
 .tab-news-circle:active{transform:scale(0.93)}
 .tab-news-circle.active-news{filter:drop-shadow(0 4px 12px rgba(0,201,177,0.4))}
-.tab-news-circle img{width:100%;height:100%;object-fit:contain;mix-blend-mode:screen}
-.tab-news-label{font-size:9px;letter-spacing:.04em;font-family:'DM Mono',monospace;margin-top:20px;color:var(--text3)}
+.tab-news-circle img{width:100%;height:100%;object-fit:contain;transition:filter .15s;}
+/* 白底模式下自動反轉 icon 顏色 */
+[data-theme="light"] .tab-news-circle img { filter:invert(1); }
+.tab-news-label{font-size:9px;letter-spacing:.04em;font-family:'DM Mono',monospace;margin-top:24px;color:var(--text3)}
 .tab-news-label.active{color:var(--accent)}
 
 .page{display:none;height:100%;flex-direction:column;overflow:hidden}
@@ -134,6 +136,7 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 .field-label{font-size:11px;color:var(--text2);margin-bottom:4px;letter-spacing:.04em;font-family:'DM Mono',monospace}
 .field-input,.field-select{width:100%;padding:10px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:11px;color:var(--text);font-size:15px;font-family:'Noto Sans TC',sans-serif;outline:none;transition:border .15s;-webkit-appearance:none;appearance:none}
 .field-input:focus,.field-select:focus{border-color:var(--accent)}
+.field-input:disabled,.field-select:disabled{opacity:0.6; cursor:not-allowed;}
 .field-input::placeholder{color:var(--text3)}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .save-btn{width:100%;padding:13px;background:var(--accent);border:none;border-radius:13px;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:6px}
@@ -176,7 +179,20 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 .fixed-section{padding:0 16px;margin-bottom:14px}
 .fixed-title{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
 
-/* Period summary — beautiful version */
+/* Pie Chart Styles */
+.pie-section { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; padding: 0 16px 14px; }
+.pie-col { background: var(--bg1); border: 1px solid var(--border); border-radius: 14px; padding: 12px 10px; box-shadow: var(--shadow); }
+.pie-title { font-size: 11px; color: var(--text2); text-align: center; margin-bottom: 12px; font-family: 'DM Mono', monospace; font-weight: 500; letter-spacing: 0.05em; }
+.pie-chart-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pie-circle { width: 85px; height: 85px; border-radius: 50%; box-shadow: inset 0 0 0 3px var(--bg1); }
+.pie-empty { width: 85px; height: 85px; border-radius: 50%; background: var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.pie-legend { width: 100%; display: flex; flex-direction: column; gap: 5px; }
+.pie-leg-item { display: flex; align-items: center; font-size: 10px; color: var(--text); }
+.pie-dot { width: 8px; height: 8px; border-radius: 3px; margin-right: 6px; flex-shrink: 0; }
+.pie-leg-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 11px; }
+.pie-leg-pct { font-family: 'DM Mono', monospace; color: var(--text3); font-size: 10px; }
+
+/* Period summary */
 .period-wrap{padding:0 16px;margin-bottom:14px}
 .period-year-label{font-size:11px;font-weight:500;color:var(--text2);font-family:'DM Mono',monospace;letter-spacing:.05em;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
 .period-month-card{background:var(--bg1);border:1px solid var(--border);border-radius:12px;padding:10px 13px;margin-bottom:7px;box-shadow:var(--shadow)}
@@ -209,9 +225,7 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 .news-card-meta{display:flex;align-items:center;justify-content:space-between}
 .news-card-time{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
 .news-card-tag{font-size:9px;padding:2px 7px;border-radius:4px;background:var(--bg3);color:var(--text3);font-family:'DM Mono',monospace}
-.news-loading{text-align:center;padding:40px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
-.news-error{text-align:center;padding:30px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
-.news-refresh-btn{margin:10px auto 0;display:block;padding:8px 20px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--accent);font-size:12px;cursor:pointer;font-family:'DM Mono',monospace}
+.news-loading,.news-error{text-align:center;padding:40px 16px;color:var(--text3);font-size:12px;font-family:'DM Mono',monospace;line-height:2}
 
 /* Currency modal */
 .cur-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 16px 6px}
@@ -222,7 +236,6 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 
 .toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-8px);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px 15px;font-size:12px;color:var(--text2);opacity:0;transition:all .25s;z-index:400;white-space:nowrap;font-family:'DM Mono',monospace;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.linked-badge{font-size:9px;padding:2px 6px;border-radius:4px;background:rgba(0,201,177,.15);color:var(--accent);font-family:'DM Mono',monospace;display:inline-block;margin-top:2px}
 </style>
 </head>
 <body>
@@ -274,6 +287,15 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
         <div class="card-sub" id="h-savings-sub">0 帳戶</div>
       </div>
     </div>
+    
+    <!-- Sponsor ENZO Card -->
+    <div style="padding: 0 16px 16px;">
+      <div class="card" onclick="openSponsorModal()" style="display:flex; align-items:center; justify-content:center; gap:8px; background:var(--bg3); border-color:var(--accent);">
+        <span style="font-size:18px">💎</span>
+        <span style="font-size:14px; font-weight:600; color:var(--text)">贊助 ENZO</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -357,6 +379,7 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
     </div>
     <div id="cal-wrap"><div class="cal-grid" id="cal-grid"></div></div>
     <div id="period-wrap"></div>
+    <div id="pie-wrap"></div> <!-- Pie chart container -->
     <div class="day-detail" id="day-detail"></div>
     <div class="fixed-section" id="fixed-section"></div>
   </div>
@@ -384,7 +407,7 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
   </div>
 </div>
 
-<!-- Tab Bar — 5 items, center = news -->
+<!-- Tab Bar -->
 <div class="tab-bar">
   <div class="tab-item active" id="tab-home" onclick="switchPage('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg>
@@ -436,11 +459,11 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Stable DB key — never change this ──────────────────────────
+// ── Stable DB key ──────────────────────────
 const DB = 'asset-tracker-stable-v1';
 const BLANK = {
   stock:[],crypto:[],gold:[],demand:[],fixed:[],
-  entries:{},fixedItems:[],
+  entries:{},fixedItems:[],customCats:[],
   usdTwd:32,xauUsd:3300,
   rates:{USD:1,TWD:32,AUD:0.65,SGD:0.75,CNY:7.2},
   displayCur:'TWD',theme:'dark',lastSync:null
@@ -465,11 +488,11 @@ applyTheme();
 
 // ── Currency ──────────────────────────────────────────────────
 const CURRENCIES=[
-  {code:'TWD',sym:'NT$',label:'NT$ 新台幣'},
-  {code:'USD',sym:'USD$',label:'USD$ 美元'},
-  {code:'AUD',sym:'AUD$',label:'AUD$ 澳幣'},
-  {code:'SGD',sym:'SGD$',label:'SGD$ 新幣'},
-  {code:'CNY',sym:'CNY¥',label:'CNY¥ 人民幣'}
+  {code:'TWD',sym:'NT$',label:'新台幣'},
+  {code:'USD',sym:'USD$',label:'美元'},
+  {code:'AUD',sym:'AUD$',label:'澳幣'},
+  {code:'SGD',sym:'SGD$',label:'新幣'},
+  {code:'CNY',sym:'CNY¥',label:'人民幣'}
 ];
 function curObj(){ return CURRENCIES.find(c=>c.code===state.displayCur)||CURRENCIES[0]; }
 function curSym(){ return curObj().sym; }
@@ -588,7 +611,7 @@ function renderInvest(){
         <div class="item-body">
           <div class="item-name">${x.name||'—'}</div>
           <div class="item-detail">${fmtN(x.shares)} 股${x.price?` × ${fmtN(x.price)} TWD`:' (待輸入現價)'}</div>
-          <span class="item-badge">${x.ticker||'未設代號'} <span style="color:var(--text3);font-size:8px">（市場價格需手動更新）</span></span>
+          <span class="item-badge">${x.ticker||'未設代號'} <span style="color:var(--text3);font-size:8px">（無法自動追蹤市場價格，請手動更新）</span></span>
         </div>
         <div class="item-right"><div class="item-val">${fmtDisplay(val)}</div><div class="item-pnl">${pnlHtml(stockPnl(x))}</div></div>
         <div class="act-row"><button class="act-btn" onclick="openModal('stock',${i})">✎</button><button class="act-btn del-btn" onclick="del('stock',${i})">×</button></div>
@@ -641,8 +664,8 @@ function renderSavings(){
     <div class="list-item">
       <div class="item-dot" style="background:#0a1f12;color:#22c55e">活</div>
       <div class="item-body"><div class="item-name">${x.name}${badge(x)}</div>
-        <div class="item-detail">年利率 ${x.rate||0}%${x.currency&&x.currency!=='TWD'?` · ${fmtCur(x.balance,x.currency)}`:''}</div></div>
-      <div class="item-right"><div class="item-val">${fmtDisplay(savTWD(x))}</div></div>
+        <div class="item-detail">年利率 ${x.rate||0}%${x.currency&&x.currency!=='TWD'?` · 約 ${fmtDisplay(savTWD(x))}`:''}</div></div>
+      <div class="item-right"><div class="item-val">${fmtCur(x.balance,x.currency||'TWD')}</div></div>
       <div class="act-row"><button class="act-btn" onclick="openModal('demand',${i})">✎</button><button class="act-btn del-btn" onclick="del('demand',${i})">×</button></div>
     </div>`).join('')+'</div>'
     :'<div class="list-wrap"><div class="empty-state">尚無活存記錄</div></div>';
@@ -650,8 +673,8 @@ function renderSavings(){
     <div class="list-item">
       <div class="item-dot" style="background:#0a1624;color:#38bdf8">定</div>
       <div class="item-body"><div class="item-name">${x.name}${badge(x)}</div>
-        <div class="item-detail">利率 ${x.rate||0}% · 到期 ${x.maturity||'—'}${x.currency&&x.currency!=='TWD'?` · ${fmtCur(x.balance,x.currency)}`:''}</div></div>
-      <div class="item-right"><div class="item-val">${fmtDisplay(savTWD(x))}</div></div>
+        <div class="item-detail">到期 ${x.maturity||'—'}${x.currency&&x.currency!=='TWD'?` · 約 ${fmtDisplay(savTWD(x))}`:''}</div></div>
+      <div class="item-right"><div class="item-val">${fmtCur(x.balance,x.currency||'TWD')}</div></div>
       <div class="act-row"><button class="act-btn" onclick="openModal('fixed',${i})">✎</button><button class="act-btn del-btn" onclick="del('fixed',${i})">×</button></div>
     </div>`).join('')+'</div>'
     :'<div class="list-wrap"><div class="empty-state">尚無定存記錄</div></div>';
@@ -660,9 +683,34 @@ function renderSavings(){
 // ── Ledger ────────────────────────────────────────────────────
 let calY=new Date().getFullYear(),calM=new Date().getMonth(),selDate=null,ledView='month';
 const MN=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
-const CATS=[{e:'🍜',n:'餐飲'},{e:'🚌',n:'交通'},{e:'🛍',n:'購物'},{e:'🎮',n:'娛樂'},{e:'🏥',n:'醫療'},{e:'🏠',n:'居住'},{e:'💼',n:'薪資'},{e:'💰',n:'收益'},{e:'📦',n:'其他'}];
+const CATS=[{e:'🍜',n:'餐飲'},{e:'🚌',n:'交通'},{e:'🛍',n:'購物'},{e:'🎮',n:'娛樂'},{e:'🏥',n:'醫療'},{e:'🏠',n:'居住'},{e:'💼',n:'薪資'},{e:'💰',n:'收益'},{e:'🏠',n:'家用'},{e:'👩',n:'Mother Pay'},{e:'📦',n:'其他'}];
 const cKey=(y,m,d)=>`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
 const todayKey=()=>{const n=new Date();return cKey(n.getFullYear(),n.getMonth(),n.getDate());};
+
+function getCats() {
+  const customCats = state.customCats || [];
+  return [...CATS, ...customCats];
+}
+
+function checkCustomCat(sel) {
+  if (sel.value === 'custom') {
+    const name = prompt('請輸入自訂類別名稱（可包含表情符號，例如：🚗 車貸）：');
+    if (name && name.trim()) {
+      if (!state.customCats) state.customCats = [];
+      const emojiMatch = name.match(/^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/u);
+      const e = emojiMatch ? emojiMatch[0] : '🏷';
+      const n = emojiMatch ? name.replace(emojiMatch[0], '').trim() : name.trim();
+      state.customCats.push({ e, n });
+      save();
+      // 重新渲染選項
+      const options = getCats().map(c => `<option value="${c.n}">${c.e} ${c.n}</option>`).join('') + '<option value="custom">＋ 新增自訂類別...</option>';
+      sel.innerHTML = options;
+      sel.value = n;
+    } else {
+      sel.value = getCats()[0].n; // 預設回復
+    }
+  }
+}
 
 function setView(v){
   ledView=v;
@@ -677,7 +725,6 @@ function getMonthsForPeriod(){
   if(ledView==='year'){
     return Array.from({length:12},(_,i)=>({y:year,m:i}));
   }
-  // half: first 6 or last 6 of calY — show H1 or H2 based on calM
   const half=calM<6?0:1;
   return Array.from({length:6},(_,i)=>({y:year,m:half*6+i}));
 }
@@ -699,12 +746,83 @@ function calcTotals(months){
   return{inc,exp,net:inc-exp};
 }
 
+function renderPieCharts(months) {
+    const prefixes = months.map(({y,m})=>`${y}-${String(m+1).padStart(2,'0')}`);
+    let expMap = {}, incMap = {};
+    let totalExp = 0, totalInc = 0;
+
+    Object.entries(state.entries).forEach(([k,es])=>{
+        if(!prefixes.some(p=>k.startsWith(p))) return;
+        es.forEach(e=>{
+            const a = toTWD(parseFloat(e.amount)||0, e.currency||'TWD');
+            const cName = e.cat || '其他';
+            if(e.type === 'income') {
+                incMap[cName] = (incMap[cName]||0) + a;
+                totalInc += a;
+            } else {
+                expMap[cName] = (expMap[cName]||0) + a;
+                totalExp += a;
+            }
+        });
+    });
+    
+    state.fixedItems.forEach(fi=>{
+        const a = parseFloat(fi.amount)||0;
+        let cnt = months.length;
+        if(fi.freq==='yearly') cnt=months.length>=12?1:0;
+        else if(fi.freq==='halfyearly') cnt=months.length>=6?1:Math.floor(months.length/6);
+        const amt = a * cnt;
+        if(amt > 0) {
+            const cName = fi.cat || '其他';
+            if(fi.type === 'income') {
+                incMap[cName] = (incMap[cName]||0) + amt;
+                totalInc += amt;
+            } else {
+                expMap[cName] = (expMap[cName]||0) + amt;
+                totalExp += amt;
+            }
+        }
+    });
+
+    const buildPie = (map, total) => {
+        if(total === 0) return `<div class="pie-empty">無資料</div>`;
+        let sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
+        let gradient = [];
+        let currentPct = 0;
+        const colors = ['#f43f5e', '#38bdf8', '#22c55e', '#f59e0b', '#d4af37', '#a855f7', '#ec4899', '#14b8a6', '#6366f1'];
+        let legendHTML = '';
+
+        sorted.forEach(([cat, amt], i) => {
+            const pct = (amt / total) * 100;
+            const color = colors[i % colors.length];
+            gradient.push(`${color} ${currentPct}% ${currentPct + pct}%`);
+            currentPct += pct;
+            legendHTML += `<div class="pie-leg-item"><span class="pie-dot" style="background:${color}"></span><span class="pie-leg-name">${cat}</span><span class="pie-leg-pct">${pct.toFixed(1)}%</span></div>`;
+        });
+        return `<div class="pie-chart-wrap">
+                    <div class="pie-circle" style="background: conic-gradient(${gradient.join(', ')})"></div>
+                    <div class="pie-legend">${legendHTML}</div>
+                </div>`;
+    };
+
+    return `<div class="pie-section">
+                <div class="pie-col">
+                    <div class="pie-title">支出分析</div>
+                    ${buildPie(expMap, totalExp)}
+                </div>
+                <div class="pie-col">
+                    <div class="pie-title">收入分析</div>
+                    ${buildPie(incMap, totalInc)}
+                </div>
+            </div>`;
+}
+
 function renderLedger(){
   const months=getMonthsForPeriod();
   const calWrap=document.getElementById('cal-wrap');
   const periodWrap=document.getElementById('period-wrap');
+  const pieWrap=document.getElementById('pie-wrap');
 
-  // Nav label
   if(ledView==='month'){
     document.getElementById('cal-label').textContent=`${calY} 年 ${MN[calM]}`;
   } else if(ledView==='year'){
@@ -714,7 +832,6 @@ function renderLedger(){
     document.getElementById('cal-label').textContent=`${calY} ${half}`;
   }
 
-  // Calendar or period view
   if(ledView==='month'){
     calWrap.style.display='';
     periodWrap.innerHTML='';
@@ -732,11 +849,9 @@ function renderLedger(){
     document.getElementById('cal-grid').innerHTML=h;
   } else {
     calWrap.style.display='none';
-    // Beautiful monthly breakdown
     let html='<div class="period-wrap">';
     const yearLabel=ledView==='year'?`${calY} 全年`:`${calY} ${calM<6?'上':'下'}半年`;
     html+=`<div class="period-year-label">${yearLabel} 收支明細</div>`;
-    // find max for scaling
     let maxVal=1;
     months.forEach(({y,m})=>{
       const prefix=`${y}-${String(m+1).padStart(2,'0')}`;
@@ -775,7 +890,9 @@ function renderLedger(){
     periodWrap.innerHTML=html+'</div>';
   }
 
-  // Summary cards
+  // Generate Pie Charts
+  pieWrap.innerHTML = renderPieCharts(months);
+
   const {inc,exp,net}=calcTotals(months);
   document.getElementById('lv-income').textContent=fmtTWD(inc);
   document.getElementById('lv-expense').textContent=fmtTWD(exp);
@@ -794,7 +911,8 @@ function renderDayDetail(){
   let h=`<div class="day-title">${parseInt(m)}月${parseInt(d)}日</div>`;
   if(!es.length)h+=`<div style="font-size:12px;color:var(--text3);text-align:center;padding:10px;font-family:'DM Mono',monospace">無記錄</div>`;
   else es.forEach((e,i)=>{
-    const cat=CATS.find(c=>c.n===e.cat)||CATS[CATS.length-1];
+    const allCats = getCats();
+    const cat=allCats.find(c=>c.n===e.cat)||allCats[allCats.length-1];
     const amt=toTWD(parseFloat(e.amount)||0,e.currency||'TWD');
     h+=`<div class="entry-item">
       <span class="entry-cat">${cat.e}</span>
@@ -813,8 +931,9 @@ function renderFixedItems(){
   if(!state.fixedItems.length){el.innerHTML='';return;}
   const freqL={monthly:'每月',halfyearly:'每半年',yearly:'每年'};
   let h=`<div class="fixed-title">固定項目</div><div class="list-wrap">`;
+  const allCats = getCats();
   state.fixedItems.forEach((fi,i)=>{
-    const cat=CATS.find(c=>c.n===fi.cat)||CATS[CATS.length-1];
+    const cat=allCats.find(c=>c.n===fi.cat)||allCats[allCats.length-1];
     h+=`<div class="list-item">
       <span style="font-size:16px">${cat.e}</span>
       <div class="item-body"><div class="item-name">${fi.name}</div>
@@ -844,17 +963,7 @@ function delEntry(k,i){state.entries[k].splice(i,1);if(!state.entries[k].length)
 function delFixedItem(i){state.fixedItems.splice(i,1);save();renderLedger();}
 
 // ── News ─────────────────────────────────────────────────────
-let newsSrc='all', newsCache=[], newsLoaded=false;
-
-const NEWS_FEEDS=[
-  {src:'market',name:'市場',url:'https://feeds.finance.yahoo.com/rss/2.0/headline?s=^TWII,^GSPC,^DJI&region=US&lang=en-US'},
-  {src:'macro',name:'總經',url:'https://www.reutersagency.com/feed/?best-topics=business-finance&post_type=best'},
-  {src:'crypto',name:'加密',url:'https://cointelegraph.com/rss'},
-  {src:'asia',name:'亞洲',url:'https://feeds.bbci.co.uk/news/business/rss.xml'},
-  {src:'us',name:'美國',url:'https://feeds.a.dj.com/rss/WSJcomUSBusiness.xml'}
-];
-
-// Curated static news as fallback (always fresh-looking with real topics)
+let newsSrc='all';
 const STATIC_NEWS=[
   {src:'市場',title:'美聯儲維持利率不變，Fed官員暗示年內仍有降息空間',desc:'聯準會在最新會議中維持基準利率於現有水準，但官員表示若通膨持續降溫，年內仍可能啟動降息。市場對此反應正面。',tag:'宏觀',time:'2h ago',url:'https://www.bloomberg.com'},
   {src:'加密',title:'比特幣突破九萬美元大關，機構買盤持續湧入',desc:'比特幣價格持續走強，現貨ETF持續吸引機構資金流入，分析師看好後續行情。以太坊同步走高。',tag:'加密貨幣',time:'3h ago',url:'https://cointelegraph.com'},
@@ -894,7 +1003,7 @@ function renderNews(){
     </a>`).join('');
 }
 
-async function loadNews(force=false){
+function loadNews(force=false){
   renderNews();
 }
 
@@ -917,6 +1026,42 @@ const vv=id=>{const el=document.getElementById('f-'+id);return el?el.value.trim(
 const curOpts=()=>CURRENCIES.map(c=>`<option value="${c.code}">${c.sym} ${c.label}</option>`).join('');
 const demandOpts=()=>'<option value="">不連結帳戶</option>'+state.demand.map((d,i)=>`<option value="${i}">${d.name}</option>`).join('');
 
+function openSponsorModal() {
+  modalType = 'sponsor';
+  document.getElementById('modal-title').textContent = '贊助 ENZO';
+  document.getElementById('modal-body').innerHTML = `
+    <div style="text-align:center; padding:10px 0 20px;">
+      <div style="background:#fff; padding:10px; border-radius:12px; display:inline-block; margin-bottom:16px;">
+        <!-- 請將 qrcode.jpg 換成你實際的 QR Code 檔名與路徑 -->
+        <img src="qrcode.jpg" alt="USDT QR" style="width:180px;height:180px;object-fit:cover;border-radius:8px" onerror="this.outerHTML='<div style=\\'width:180px;height:180px;background:#f5f5f5;color:#999;display:flex;align-items:center;justify-content:center;font-size:12px;border-radius:8px;border:1px solid #ddd\\'>請上傳 qrcode.jpg</div>'"/>
+      </div>
+      <div style="font-size:16px; font-weight:700; margin-bottom:8px; color:var(--text); font-family:'DM Mono',monospace; letter-spacing:1px">USDT (TRC20)</div>
+      <div style="font-size:12px; color:var(--text2); background:var(--bg2); padding:12px; border-radius:10px; margin-bottom:20px; word-break:break-all; user-select:all; border:1px solid var(--border); font-family:'DM Mono',monospace;">
+        <!-- 請將下方文字換成你的 USDT 地址 -->
+        TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+      </div>
+      <div style="font-size:12px; color:var(--text3); line-height:1.6; padding:0 10px;">
+        您的贊助資金將全數用於支援 ENZO HSIAO 的 APP 系統維護，以及醫美皮秒療程相關支出。
+      </div>
+    </div>
+  `;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function updateEntryCurrency() {
+  const linked = document.getElementById('f-linked').value;
+  const curSel = document.getElementById('f-currency');
+  if(linked !== '') {
+    const acc = state.demand[parseInt(linked)];
+    if(acc) {
+      curSel.value = acc.currency || 'TWD';
+      curSel.disabled = true; // 強制鎖定幣種
+    }
+  } else {
+    curSel.disabled = false;
+  }
+}
+
 function openModal(type,idx=-1){
   modalType=type;editIdx=idx;
   const isEdit=idx>=0,item=isEdit?(state[type]?.[idx]||null):null;
@@ -929,7 +1074,7 @@ function openModal(type,idx=-1){
       <div class="field"><div class="field-label">股票名稱</div><input class="field-input" id="f-name" placeholder="例：台積電" value="${item?.name||''}"/></div>
       <div class="field"><div class="field-label">股票代號（選填）</div><input class="field-input" id="f-ticker" placeholder="台股：2330　美股：AAPL" value="${item?.ticker||''}" oninput="this.value=this.value.toUpperCase()"/></div>
       <div class="field"><div class="field-label">持有股數</div><input class="field-input" id="f-shares" type="number" placeholder="1000" value="${item?.shares||''}"/></div>
-      <div class="field"><div class="field-label">現價 TWD（市場價格需手動更新）</div><input class="field-input" id="f-price" type="number" placeholder="例：820" value="${item?.price||''}"/></div>
+      <div class="field"><div class="field-label">現價 TWD（無法自動追蹤市場價格，請手動更新）</div><input class="field-input" id="f-price" type="number" placeholder="例：820" value="${item?.price||''}"/></div>
       <div class="field"><div class="field-label">總成本 TWD（選填，計算損益）</div><input class="field-input" id="f-totalCost" type="number" placeholder="填你股票 App 顯示的總成本" value="${item?.totalCost??''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
@@ -1001,14 +1146,19 @@ function openModal(type,idx=-1){
           <label class="radio-opt"><input type="radio" name="etype" value="income" style="accent-color:var(--green)"><span style="color:var(--green)">收入</span></label>
         </div>
       </div>
-      <div class="field"><div class="field-label">類別</div><select class="field-select" id="f-cat">${CATS.map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}</select></div>
+      <div class="field"><div class="field-label">類別</div>
+        <select class="field-select" id="f-cat" onchange="checkCustomCat(this)">
+          ${getCats().map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}
+          <option value="custom">＋ 新增自訂類別...</option>
+        </select>
+      </div>
       <div class="field"><div class="field-label">名稱（選填）</div><input class="field-input" id="f-name" placeholder="例：午餐"/></div>
+      <div class="field"><div class="field-label">連結活存帳戶（自動增減餘額）</div><select class="field-select" id="f-linked" onchange="updateEntryCurrency()">${demandOpts()}</select></div>
       <div class="field-row">
         <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-currency">${curOpts()}</select></div>
         <div class="field"><div class="field-label">金額</div><input class="field-input" id="f-amount" type="number" placeholder="150"/></div>
       </div>
       <div class="field"><div class="field-label">日期</div><input class="field-input" id="f-date" type="date" value="${def}"/></div>
-      <div class="field"><div class="field-label">連結活存帳戶（自動增減餘額）</div><select class="field-select" id="f-linked">${demandOpts()}</select></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='fixed-item'){
@@ -1019,7 +1169,12 @@ function openModal(type,idx=-1){
           <label class="radio-opt"><input type="radio" name="fitype" value="income" style="accent-color:var(--green)"><span style="color:var(--green)">固定收入</span></label>
         </div>
       </div>
-      <div class="field"><div class="field-label">類別</div><select class="field-select" id="f-cat">${CATS.map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}</select></div>
+      <div class="field"><div class="field-label">類別</div>
+        <select class="field-select" id="f-cat" onchange="checkCustomCat(this)">
+          ${getCats().map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}
+          <option value="custom">＋ 新增自訂類別...</option>
+        </select>
+      </div>
       <div class="field"><div class="field-label">名稱</div><input class="field-input" id="f-name" placeholder="例：薪資、房租"/></div>
       <div class="field"><div class="field-label">金額 TWD</div><input class="field-input" id="f-amount" type="number" placeholder="50000"/></div>
       <div class="field"><div class="field-label">頻率</div>
@@ -1029,10 +1184,12 @@ function openModal(type,idx=-1){
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>document.querySelector('#modal-body input,#modal-body select')?.focus(),350);
+  if(type === 'entry') updateEntryCurrency();
+  setTimeout(()=>document.querySelector('#modal-body input:not([type="radio"]),#modal-body select')?.focus(),350);
 }
 
 function saveModal(){
+  if (modalType === 'sponsor') { closeModal(); return; }
   const type=modalType;let obj={};
   if(type==='stock'){
     const name=vv('name'),ticker=vv('ticker'),shares=parseFloat(vv('shares')),price=parseFloat(vv('price')),tc=vv('totalCost');
@@ -1071,7 +1228,8 @@ function saveModal(){
   }
   else if(type==='entry'){
     const etype=document.querySelector('input[name="etype"]:checked')?.value||'expense';
-    const cat=vv('cat'),name=vv('name'),cur=vv('currency')||'TWD',amount=parseFloat(vv('amount')),date=vv('date'),linkedVal=vv('linked');
+    const cat=vv('cat'),name=vv('name'),amount=parseFloat(vv('amount')),date=vv('date'),linkedVal=vv('linked');
+    const cur=document.getElementById('f-currency').value||'TWD';
     if(isNaN(amount)||amount<=0){showToast('請填寫金額');return;}
     if(!date){showToast('請選擇日期');return;}
     const amtTWD=toTWD(amount,cur);
@@ -1112,11 +1270,12 @@ function switchPage(page){
   document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+page)?.classList.add('active');
   document.getElementById('tab-'+page)?.classList.add('active');
-  // News circle
+  
   const nc=document.getElementById('tab-news-circle');
   const nl=document.getElementById('tab-news-label');
   if(page==='news'){nc.classList.add('active-news');nl.classList.add('active');}
   else{nc.classList.remove('active-news');nl.classList.remove('active');}
+  
   if(page==='home')renderHome();
   if(page==='invest')renderInvest();
   if(page==='gold')renderGold();
@@ -1128,9 +1287,6 @@ function switchPage(page){
 // ── Toast ─────────────────────────────────────────────────────
 let toastT;
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2500);}
-
-// ── SW ────────────────────────────────────────────────────────
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 // ── Init ──────────────────────────────────────────────────────
 function renderAll(){renderHome();renderInvest();renderGold();renderSavings();}
