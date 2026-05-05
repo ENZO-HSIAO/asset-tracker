@@ -611,12 +611,12 @@ function renderHome(){
   document.getElementById('h-gold-sub').textContent=state.gold.reduce((s,x)=>s+(parseFloat(x.grams)||0),0).toFixed(1)+' 克';
   document.getElementById('h-savings').textContent=fmtDisplay(sv);
   document.getElementById('h-savings-sub').textContent=(state.demand.length+state.fixed.length)+' 帳戶';
+  renderCustomCards();
   const bar=document.getElementById('alloc-bar');
   if(!grand){bar.innerHTML='';return;}
   const cu=totalCustom();
   bar.innerHTML=[{v:st,c:'var(--accent)'},{v:cr,c:'var(--amber)'},{v:gld,c:'var(--gold)'},{v:sv,c:'var(--green)'},{v:cu,c:'#a78bfa'}]
     .map(x=>`<div class="alloc-seg" style="width:${(x.v/grand*100).toFixed(1)}%;background:${x.c}"></div>`).join('');
-  renderCustomCards();
 }
 
 // ── Render Custom Cards ──────────────────────────────────────
@@ -638,7 +638,7 @@ function renderCustomCards(){
       <div class="card-sub">${x.currency&&x.currency!=='TWD'?fmtCur(x.balance,x.currency):''}</div>
     </div>`).join('');
 }
-function delCustom(i){if(!confirm('確定刪除？'))return;state.customAssets.splice(i,1);save();renderHome();}
+function delCustom(i){state.customAssets.splice(i,1);save();renderHome();showToast('已刪除');}
 
 // ── Render Invest ─────────────────────────────────────────────
 function renderInvest(){
@@ -1033,7 +1033,7 @@ function calNext(){
   renderLedger();
 }
 function delEntry(k,i){state.entries[k].splice(i,1);if(!state.entries[k].length)delete state.entries[k];save();renderLedger();}
-function delFixedItem(i){state.fixedItems.splice(i,1);save();renderLedger();}
+function delFixedItem(i){state.fixedItems.splice(i,1);save();renderLedger();showToast('已刪除');}
 
 // ── News ─────────────────────────────────────────────────────
 let newsSrc='all', newsItems=[], newsLoading=false, newsLastFetch=0;
@@ -1433,7 +1433,7 @@ function saveModal(){
   }
 }
 
-function del(type,idx){if(!confirm('確定刪除？'))return;state[type].splice(idx,1);save();renderAll();}
+function del(type,idx){state[type].splice(idx,1);save();renderAll();showToast('已刪除');}
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');modalType=null;editIdx=-1;}
 function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
 
