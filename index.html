@@ -234,6 +234,9 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
 .cur-opt-sym{font-size:16px;font-weight:700;color:var(--text);font-family:'DM Mono',monospace}
 .cur-opt-name{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:1px}
 
+.card.dragging{opacity:0.5;transform:scale(0.96);border:1px dashed var(--accent)!important;}
+.card.drag-over{border:1px solid var(--accent)!important;box-shadow:0 0 0 2px rgba(0,201,177,0.3);}
+.drag-handle{position:absolute;top:6px;left:6px;color:var(--text3);font-size:11px;opacity:0.5;cursor:grab;line-height:1;user-select:none;touch-action:none;}
 .toast{position:fixed;top:calc(var(--safe-top) + 52px);left:50%;transform:translateX(-50%) translateY(-8px);background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:7px 15px;font-size:12px;color:var(--text2);opacity:0;transition:all .25s;z-index:400;white-space:nowrap;font-family:'DM Mono',monospace;pointer-events:none}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
@@ -261,31 +264,8 @@ body{color:var(--text);font-family:'Noto Sans TC',sans-serif;overflow:hidden;dis
       <div class="last-update" id="last-update"></div>
     </div>
     <div class="alloc-bar" id="alloc-bar"></div>
-    <div class="cards-grid">
-      <div class="card" onclick="switchPage('invest')">
-        <div class="card-stripe" style="background:var(--accent)"></div>
-        <div class="card-icon">📈</div><div class="card-label">股票</div>
-        <div class="card-amt" id="h-stock">NT$0</div>
-        <div class="card-sub" id="h-stock-sub">0 檔</div>
-      </div>
-      <div class="card" onclick="switchPage('invest')">
-        <div class="card-stripe" style="background:var(--amber)"></div>
-        <div class="card-icon">₿</div><div class="card-label">加密貨幣</div>
-        <div class="card-amt" id="h-crypto">NT$0</div>
-        <div class="card-sub" id="h-crypto-sub">0 種</div>
-      </div>
-      <div class="card" onclick="switchPage('gold')">
-        <div class="card-stripe" style="background:var(--gold)"></div>
-        <div class="card-icon">🥇</div><div class="card-label">黃金</div>
-        <div class="card-amt" id="h-gold">NT$0</div>
-        <div class="card-sub" id="h-gold-sub">0 克</div>
-      </div>
-      <div class="card" onclick="switchPage('savings')">
-        <div class="card-stripe" style="background:var(--green)"></div>
-        <div class="card-icon">🏦</div><div class="card-label">現金存款</div>
-        <div class="card-amt" id="h-savings">NT$0</div>
-        <div class="card-sub" id="h-savings-sub">0 帳戶</div>
-      </div>
+    <div class="cards-grid" id="main-cards-grid">
+      <!-- dynamically rendered by renderHome -->
     </div>
     <!-- Custom asset cards -->
     <div id="custom-cards-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 16px 8px"></div>
@@ -472,8 +452,9 @@ const BLANK = {
   stock:[],crypto:[],gold:[],demand:[],fixed:[],
   entries:{},fixedItems:[],customCats:[],customAssets:[],
   usdTwd:32,xauUsd:3300,
-  rates:{USD:1,TWD:32,AUD:0.65,SGD:0.75,CNY:7.2},
-  displayCur:'TWD',ledgerCur:'TWD',theme:'dark',lastSync:null
+  rates:{USD:1,TWD:32,AUD:1.55,SGD:1.35,CNY:7.2},
+  displayCur:'TWD',ledgerCur:'TWD',theme:'dark',lastSync:null,
+  cardOrder:['stock','crypto','gold','savings']
 };
 let state = {...BLANK};
 function load(){
@@ -484,6 +465,10 @@ function load(){
 }
 function save(){ localStorage.setItem(DB,JSON.stringify(state)); }
 load();
+// 修正舊版存錯的 AUD/SGD 匯率（0.65/0.75 是反向值，正確應 >1）
+if((state.rates.AUD||0) < 1) state.rates.AUD = 1.55;
+if((state.rates.SGD||0) < 1) state.rates.SGD = 1.35;
+save();
 
 // ── Theme ──────────────────────────────────────────────────────
 function applyTheme(){
@@ -511,11 +496,16 @@ function twdToDisplay(twd){
 }
 function fmtDisplay(twd){
   const v=twdToDisplay(twd),abs=Math.abs(v);
-  const s=abs>=1000000?(v/1000000).toFixed(2)+'M':abs>=10?Math.round(v).toLocaleString('zh-TW'):v.toFixed(2);
+  const dec2=['USD','AUD','SGD'].includes(state.displayCur);
+  let s;
+  if(abs>=1000000) s=(v/1000000).toFixed(2)+'M';
+  else if(dec2) s=v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  else if(abs>=10) s=Math.round(v).toLocaleString('zh-TW');
+  else s=v.toFixed(2);
   return curSym()+s;
 }
 function fmtTWD(n){ return 'NT$'+Math.round(n).toLocaleString('zh-TW'); }
-function fmtCur(n,cur){ const c=CURRENCIES.find(x=>x.code===cur)||CURRENCIES[0]; return c.sym+Math.round(n).toLocaleString('zh-TW'); }
+function fmtCur(n,cur){ const c=CURRENCIES.find(x=>x.code===cur)||CURRENCIES[0]; const v=parseFloat(n)||0; if(cur==='USD'||cur==='AUD'||cur==='SGD'){return c.sym+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});} return c.sym+Math.round(v).toLocaleString('zh-TW'); }
 function toTWD(amount,cur){
   if(!cur||cur==='TWD') return parseFloat(amount)||0;
   return (parseFloat(amount)||0)/( state.rates[cur]||1)*state.usdTwd;
@@ -567,7 +557,38 @@ function grandTotal(){ return totalStock()+totalCrypto()+totalGold()+totalSav()+
 // ── Sync ──────────────────────────────────────────────────────
 let syncing=false;
 async function fetchRates(){
-  try{const r=await fetch('https://api.exchangerate-api.com/v4/latest/USD');if(!r.ok)throw 0;const d=await r.json();if(d.rates){state.usdTwd=d.rates.TWD||state.usdTwd;state.rates={USD:1,TWD:d.rates.TWD||32,AUD:d.rates.AUD||0.65,SGD:d.rates.SGD||0.75,CNY:d.rates.CNY||7.2};}}catch(e){}
+  // 嘗試多個來源，取第一個成功的
+  const sources = [
+    async () => {
+      const r = await fetch('https://api.frankfurter.app/latest?from=USD&to=TWD,AUD,SGD,CNY');
+      if(!r.ok) throw 0;
+      const d = await r.json();
+      return {TWD:d.rates.TWD, AUD:d.rates.AUD, SGD:d.rates.SGD, CNY:d.rates.CNY};
+    },
+    async () => {
+      const r = await fetch('https://open.er-api.com/v6/latest/USD');
+      if(!r.ok) throw 0;
+      const d = await r.json();
+      if(d.result !== 'success') throw 0;
+      return {TWD:d.rates.TWD, AUD:d.rates.AUD, SGD:d.rates.SGD, CNY:d.rates.CNY};
+    },
+    async () => {
+      const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+      if(!r.ok) throw 0;
+      const d = await r.json();
+      return {TWD:d.rates.TWD, AUD:d.rates.AUD, SGD:d.rates.SGD, CNY:d.rates.CNY};
+    }
+  ];
+  for(const src of sources){
+    try{
+      const rates = await src();
+      if(rates.TWD && rates.AUD){
+        state.usdTwd = rates.TWD;
+        state.rates = {USD:1, TWD:rates.TWD, AUD:rates.AUD, SGD:rates.SGD, CNY:rates.CNY};
+        return;
+      }
+    }catch(e){}
+  }
 }
 async function fetchGold(){
   try{const r=await fetch('https://query1.finance.yahoo.com/v8/finance/chart/GC%3DF?interval=1d&range=1d');if(!r.ok)throw 0;const d=await r.json();const p=d?.chart?.result?.[0]?.meta?.regularMarketPrice;if(p)state.xauUsd=p;}catch(e){}
@@ -600,25 +621,105 @@ const LOGOS={bitcoin:'https://assets.coingecko.com/coins/images/1/small/bitcoin.
 function cryptoIcon(x){const l=LOGOS[x.coinId];if(l)return`<img src="${l}" onerror="this.parentElement.innerHTML='${(x.name||'?').slice(0,2)}'" />`;return(x.name||'?').slice(0,2);}
 
 // ── Render Home ───────────────────────────────────────────────
+const CARD_DEFS = {
+  stock:{icon:'📈',label:'股票',color:'var(--accent)',page:'invest',amtId:'h-stock',subId:'h-stock-sub'},
+  crypto:{icon:'₿',label:'加密貨幣',color:'var(--amber)',page:'invest',amtId:'h-crypto',subId:'h-crypto-sub'},
+  gold:{icon:'🥇',label:'黃金',color:'var(--gold)',page:'gold',amtId:'h-gold',subId:'h-gold-sub'},
+  savings:{icon:'🏦',label:'現金存款',color:'var(--green)',page:'savings',amtId:'h-savings',subId:'h-savings-sub'},
+};
 function renderHome(){
   const st=totalStock(),cr=totalCrypto(),gld=totalGold(),sv=totalSav(),grand=grandTotal();
   document.getElementById('grand-total').textContent=fmtDisplay(grand).replace(curSym(),'');
   document.getElementById('grand-sub').textContent=grand>0?`股票 ${Math.round(st/grand*100)}% · 加密 ${Math.round(cr/grand*100)}% · 黃金 ${Math.round(gld/grand*100)}% · 存款 ${Math.round(sv/grand*100)}%`:'新增資產開始追蹤';
   if(state.lastSync){const d=new Date(state.lastSync);document.getElementById('last-update').textContent=`更新於 ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;}
-  document.getElementById('h-stock').textContent=fmtDisplay(st);
-  document.getElementById('h-stock-sub').textContent=state.stock.length+' 檔';
-  document.getElementById('h-crypto').textContent=fmtDisplay(cr);
-  document.getElementById('h-crypto-sub').textContent=state.crypto.length+' 種';
-  document.getElementById('h-gold').textContent=fmtDisplay(gld);
-  document.getElementById('h-gold-sub').textContent=state.gold.reduce((s,x)=>s+(parseFloat(x.grams)||0),0).toFixed(1)+' 克';
-  document.getElementById('h-savings').textContent=fmtDisplay(sv);
-  document.getElementById('h-savings-sub').textContent=(state.demand.length+state.fixed.length)+' 帳戶';
+
+  const cardVals={stock:st,crypto:cr,gold:gld,savings:sv};
+  const cardSubs={
+    stock:state.stock.length+' 檔',
+    crypto:state.crypto.length+' 種',
+    gold:state.gold.reduce((s,x)=>s+(parseFloat(x.grams)||0),0).toFixed(1)+' 克',
+    savings:(state.demand.length+state.fixed.length)+' 帳戶',
+  };
+  if(!state.cardOrder||state.cardOrder.length!==4) state.cardOrder=['stock','crypto','gold','savings'];
+  const grid=document.getElementById('main-cards-grid');
+  grid.innerHTML=state.cardOrder.map(k=>{
+    const d=CARD_DEFS[k];
+    return `<div class="card" id="card-${k}" draggable="true" data-card="${k}"
+      ondragstart="cardDragStart(event)" ondragover="cardDragOver(event)" ondrop="cardDrop(event)" ondragend="cardDragEnd(event)"
+      ontouchstart="cardTouchStart(event)" ontouchmove="cardTouchMove(event)" ontouchend="cardTouchEnd(event)"
+      onclick="cardClick(event,'${d.page}')">
+      <div class="card-stripe" style="background:${d.color}"></div>
+      <div class="drag-handle" title="長按拖曳排序">⠿</div>
+      <div class="card-icon">${d.icon}</div>
+      <div class="card-label">${d.label}</div>
+      <div class="card-amt" id="${d.amtId}">${fmtDisplay(cardVals[k])}</div>
+      <div class="card-sub" id="${d.subId}">${cardSubs[k]}</div>
+    </div>`;
+  }).join('');
+
   renderCustomCards();
   const bar=document.getElementById('alloc-bar');
   if(!grand){bar.innerHTML='';return;}
   const cu=totalCustom();
   bar.innerHTML=[{v:st,c:'var(--accent)'},{v:cr,c:'var(--amber)'},{v:gld,c:'var(--gold)'},{v:sv,c:'var(--green)'},{v:cu,c:'#a78bfa'}]
     .map(x=>`<div class="alloc-seg" style="width:${(x.v/grand*100).toFixed(1)}%;background:${x.c}"></div>`).join('');
+}
+
+// ── Card drag-to-reorder ───────────────────────────────────────
+let dragSrc=null,touchDragCard=null,touchDragClone=null,touchLongPress=null,touchOriginIdx=-1;
+function cardClick(e,page){if(e.target.classList.contains('drag-handle'))return;switchPage(page);}
+function cardDragStart(e){dragSrc=e.currentTarget;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function cardDragOver(e){e.preventDefault();const t=e.currentTarget;if(t!==dragSrc){document.querySelectorAll('.card[data-card]').forEach(c=>c.classList.remove('drag-over'));t.classList.add('drag-over');}}
+function cardDrop(e){
+  e.preventDefault();
+  const target=e.currentTarget;
+  if(!dragSrc||dragSrc===target)return;
+  const from=dragSrc.getAttribute('data-card'),to=target.getAttribute('data-card');
+  const o=state.cardOrder;const fi=o.indexOf(from),ti=o.indexOf(to);
+  if(fi>=0&&ti>=0){o.splice(fi,1);o.splice(ti,0,from);}
+  save();renderHome();
+}
+function cardDragEnd(e){document.querySelectorAll('.card[data-card]').forEach(c=>{c.classList.remove('dragging');c.classList.remove('drag-over');});dragSrc=null;}
+
+// Touch drag for mobile
+function cardTouchStart(e){
+  const card=e.currentTarget;
+  touchLongPress=setTimeout(()=>{
+    touchDragCard=card;
+    navigator.vibrate&&navigator.vibrate(30);
+    touchOriginIdx=state.cardOrder.indexOf(card.getAttribute('data-card'));
+    const rect=card.getBoundingClientRect();
+    touchDragClone=card.cloneNode(true);
+    touchDragClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.7;pointer-events:none;z-index:999;transform:scale(1.04);transition:none;border:1px solid var(--accent)`;
+    document.body.appendChild(touchDragClone);
+    card.style.opacity='0.3';
+  },350);
+}
+function cardTouchMove(e){
+  if(!touchDragCard)return;
+  e.preventDefault();
+  const t=e.touches[0];
+  if(touchDragClone){touchDragClone.style.left=(t.clientX-touchDragClone.offsetWidth/2)+'px';touchDragClone.style.top=(t.clientY-touchDragClone.offsetHeight/2)+'px';}
+  document.querySelectorAll('.card[data-card]').forEach(c=>c.classList.remove('drag-over'));
+  const el=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card[data-card]');
+  if(el&&el!==touchDragCard)el.classList.add('drag-over');
+}
+function cardTouchEnd(e){
+  clearTimeout(touchLongPress);
+  if(!touchDragCard){return;}
+  const t=e.changedTouches[0];
+  const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('.card[data-card]');
+  if(target&&target!==touchDragCard){
+    const from=touchDragCard.getAttribute('data-card'),to=target.getAttribute('data-card');
+    const o=state.cardOrder;const fi=o.indexOf(from),ti=o.indexOf(to);
+    if(fi>=0&&ti>=0){o.splice(fi,1);o.splice(ti,0,from);}
+    save();
+  }
+  if(touchDragClone){touchDragClone.remove();touchDragClone=null;}
+  touchDragCard.style.opacity='';
+  touchDragCard=null;
+  document.querySelectorAll('.card[data-card]').forEach(c=>c.classList.remove('drag-over'));
+  renderHome();
 }
 
 // ── Render Custom Cards ──────────────────────────────────────
@@ -628,11 +729,14 @@ function renderCustomCards(){
   const assets=state.customAssets||[];
   if(!assets.length){grid.innerHTML='';return;}
   grid.innerHTML=assets.map((x,i)=>`
-    <div class="card" style="position:relative">
+    <div class="card" style="position:relative" draggable="true" data-custom="${i}"
+      ondragstart="customDragStart(event)" ondragover="customDragOver(event)" ondrop="customDrop(event)" ondragend="customDragEnd(event)"
+      ontouchstart="customTouchStart(event)" ontouchmove="customTouchMove(event)" ontouchend="customTouchEnd(event)">
       <div class="card-stripe" style="background:#a78bfa"></div>
+      <div class="drag-handle" title="長按拖曳排序">⠿</div>
       <div style="position:absolute;top:8px;right:8px;display:flex;gap:3px">
-        <button onclick="openModal('custom-asset',${i})" style="width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center">✎</button>
-        <button onclick="delCustom(${i})" style="width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
+        <button onclick="event.stopPropagation();openModal('custom-asset',${i})" style="width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center">✎</button>
+        <button onclick="event.stopPropagation();delCustom(${i})" style="width:22px;height:22px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center">×</button>
       </div>
       <div class="card-icon">${x.icon||'📦'}</div>
       <div class="card-label">${x.name||'自訂'}</div>
@@ -641,6 +745,53 @@ function renderCustomCards(){
     </div>`).join('');
 }
 function delCustom(i){state.customAssets.splice(i,1);save();renderHome();showToast('已刪除');}
+
+// ── Custom card drag-to-reorder ───────────────────────────────
+let customDragSrc=null,customTouchCard=null,customTouchClone=null,customTouchLP=null;
+function customDragStart(e){customDragSrc=e.currentTarget;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function customDragOver(e){e.preventDefault();const t=e.currentTarget;if(t!==customDragSrc){document.querySelectorAll('[data-custom]').forEach(c=>c.classList.remove('drag-over'));t.classList.add('drag-over');}}
+function customDrop(e){
+  e.preventDefault();
+  const target=e.currentTarget;
+  if(!customDragSrc||customDragSrc===target)return;
+  const fi=parseInt(customDragSrc.getAttribute('data-custom')),ti=parseInt(target.getAttribute('data-custom'));
+  const arr=state.customAssets;
+  const item=arr.splice(fi,1)[0];arr.splice(ti,0,item);
+  save();renderHome();
+}
+function customDragEnd(){document.querySelectorAll('[data-custom]').forEach(c=>{c.classList.remove('dragging');c.classList.remove('drag-over');});customDragSrc=null;}
+function customTouchStart(e){
+  const card=e.currentTarget;
+  customTouchLP=setTimeout(()=>{
+    customTouchCard=card;navigator.vibrate&&navigator.vibrate(30);
+    const rect=card.getBoundingClientRect();
+    customTouchClone=card.cloneNode(true);
+    customTouchClone.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;opacity:.7;pointer-events:none;z-index:999;transform:scale(1.04);transition:none;border:1px solid var(--accent)`;
+    document.body.appendChild(customTouchClone);card.style.opacity='0.3';
+  },350);
+}
+function customTouchMove(e){
+  if(!customTouchCard)return;e.preventDefault();
+  const t=e.touches[0];
+  if(customTouchClone){customTouchClone.style.left=(t.clientX-customTouchClone.offsetWidth/2)+'px';customTouchClone.style.top=(t.clientY-customTouchClone.offsetHeight/2)+'px';}
+  document.querySelectorAll('[data-custom]').forEach(c=>c.classList.remove('drag-over'));
+  const el=document.elementFromPoint(t.clientX,t.clientY)?.closest('[data-custom]');
+  if(el&&el!==customTouchCard)el.classList.add('drag-over');
+}
+function customTouchEnd(e){
+  clearTimeout(customTouchLP);
+  if(!customTouchCard)return;
+  const t=e.changedTouches[0];
+  const target=document.elementFromPoint(t.clientX,t.clientY)?.closest('[data-custom]');
+  if(target&&target!==customTouchCard){
+    const fi=parseInt(customTouchCard.getAttribute('data-custom')),ti=parseInt(target.getAttribute('data-custom'));
+    const arr=state.customAssets;const item=arr.splice(fi,1)[0];arr.splice(ti,0,item);save();
+  }
+  if(customTouchClone){customTouchClone.remove();customTouchClone=null;}
+  customTouchCard.style.opacity='';customTouchCard=null;
+  document.querySelectorAll('[data-custom]').forEach(c=>c.classList.remove('drag-over'));
+  renderHome();
+}
 
 // ── Render Invest ─────────────────────────────────────────────
 function renderInvest(){
@@ -809,10 +960,15 @@ function calcTotals(months){
   let inc=0,exp=0;
   state.fixedItems.forEach(fi=>{
     const a=parseFloat(fi.amount)||0;
-    let cnt=months.length;
-    if(fi.freq==='yearly') cnt=months.length>=12?1:0;
+    const amtTWD=toTWD(a,fi.currency||'TWD');
+    let cnt=0;
+    if(fi.freq==='weekly') cnt=months.length*4.33;
+    else if(fi.freq==='biweekly') cnt=months.length*2.17;
+    else if(fi.freq==='custom'&&fi.customDays) cnt=(months.length*30.44)/fi.customDays;
+    else if(fi.freq==='yearly') cnt=months.length>=12?1:0;
     else if(fi.freq==='halfyearly') cnt=months.length>=6?1:Math.floor(months.length/6);
-    if(fi.type==='income') inc+=a*cnt; else exp+=a*cnt;
+    else cnt=months.length; // monthly
+    if(fi.type==='income') inc+=amtTWD*cnt; else exp+=amtTWD*cnt;
   });
   Object.entries(state.entries).forEach(([k,es])=>{
     if(!prefixes.some(p=>k.startsWith(p))) return;
@@ -843,10 +999,15 @@ function renderPieCharts(months) {
     
     state.fixedItems.forEach(fi=>{
         const a = parseFloat(fi.amount)||0;
-        let cnt = months.length;
-        if(fi.freq==='yearly') cnt=months.length>=12?1:0;
+        const amtTWD = toTWD(a, fi.currency||'TWD');
+        let cnt = 1;
+        if(fi.freq==='weekly') cnt=months.length*4.33;
+        else if(fi.freq==='biweekly') cnt=months.length*2.17;
+        else if(fi.freq==='custom'&&fi.customDays) cnt=(months.length*30.44)/fi.customDays;
+        else if(fi.freq==='yearly') cnt=months.length>=12?1:0;
         else if(fi.freq==='halfyearly') cnt=months.length>=6?1:Math.floor(months.length/6);
-        const amt = a * cnt;
+        else cnt=months.length;
+        const amt = amtTWD * cnt;
         if(amt > 0) {
             const cName = fi.cat || '其他';
             if(fi.type === 'income') {
@@ -1004,17 +1165,21 @@ function renderDayDetail(){
 function renderFixedItems(){
   const el=document.getElementById('fixed-section');
   if(!state.fixedItems.length){el.innerHTML='';return;}
-  const freqL={monthly:'每月',halfyearly:'每半年',yearly:'每年'};
+  const freqL={weekly:'每週',biweekly:'每兩週',monthly:'每月',halfyearly:'每半年',yearly:'每年',custom:'自訂'};
   let h=`<div class="fixed-title">固定項目</div><div class="list-wrap">`;
   const allCats = getCats();
   state.fixedItems.forEach((fi,i)=>{
     const cat=allCats.find(c=>c.n===fi.cat)||allCats[allCats.length-1];
+    const cur=fi.currency||'TWD';
+    const freqStr=fi.freq==='custom'&&fi.customDays?`每${fi.customDays}天`:(freqL[fi.freq||'monthly']);
+    const linkedAcc=fi.linkedAccountIdx!=null?state.demand[fi.linkedAccountIdx]:null;
+    const linkedStr=linkedAcc?` · 🔗${linkedAcc.name}`:'';
     h+=`<div class="list-item">
       <span style="font-size:16px">${cat.e}</span>
       <div class="item-body"><div class="item-name">${fi.name}</div>
-        <div class="item-detail">${freqL[fi.freq||'monthly']}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}</div></div>
+        <div class="item-detail">${freqStr}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}${linkedStr}</div></div>
       <div class="item-right"><div class="item-val" style="color:${fi.type==='income'?'var(--green)':'var(--red)'}">
-        ${fi.type==='income'?'+':'-'}${fmtTWD(fi.amount)}</div></div>
+        ${fi.type==='income'?'+':'-'}${fmtCur(fi.amount,cur)}</div></div>
       <div class="act-row"><button class="act-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
     </div>`;
   });
@@ -1216,6 +1381,23 @@ function openSponsorModal() {
   document.getElementById('modal-overlay').classList.add('open');
 }
 
+function updateFixedItemCurrency(){
+  const sel=document.getElementById('f-fi-linked');
+  const curSel=document.getElementById('f-fi-currency');
+  if(!sel||!curSel)return;
+  const v=sel.value;
+  if(v!==''){
+    const acc=state.demand[parseInt(v)];
+    if(acc){curSel.value=acc.currency||'TWD';curSel.disabled=true;}
+  }else{curSel.disabled=false;}
+}
+function toggleCustomDays(){
+  const freq=document.getElementById('f-freq')?.value;
+  const wrap=document.getElementById('f-custom-days-wrap');
+  if(wrap)wrap.style.display=freq==='custom'?'block':'none';
+}
+
+
 function updateEntryCurrency() {
   const linked = document.getElementById('f-linked').value;
   const curSel = document.getElementById('f-currency');
@@ -1223,7 +1405,7 @@ function updateEntryCurrency() {
     const acc = state.demand[parseInt(linked)];
     if(acc) {
       curSel.value = acc.currency || 'TWD';
-      curSel.disabled = true; // 強制鎖定幣種
+      curSel.disabled = true;
     }
   } else {
     curSel.disabled = false;
@@ -1346,25 +1528,43 @@ function openModal(type,idx=-1){
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   else if(type==='fixed-item'){
+    const fi=item||{};
+    const linkedOpts='<option value="">（不連結）</option>'+state.demand.map((a,i)=>`<option value="${i}"${fi.linkedAccountIdx===i?' selected':''}>${a.name} (${a.currency||'TWD'})</option>`).join('');
+    const fiCurOpts=CURRENCIES.map(c=>`<option value="${c.code}"${(fi.currency||'TWD')===c.code?' selected':''}>${c.sym} ${c.label}</option>`).join('');
+    const selFreq=fi.freq||'monthly';
     body.innerHTML=`
       <div class="field"><div class="field-label">類型</div>
         <div class="radio-group">
-          <label class="radio-opt"><input type="radio" name="fitype" value="expense" checked style="accent-color:var(--red)"><span style="color:var(--red)">固定支出</span></label>
-          <label class="radio-opt"><input type="radio" name="fitype" value="income" style="accent-color:var(--green)"><span style="color:var(--green)">固定收入</span></label>
+          <label class="radio-opt"><input type="radio" name="fitype" value="expense"${(!fi.type||fi.type==='expense')?' checked':''} style="accent-color:var(--red)"><span style="color:var(--red)">固定支出</span></label>
+          <label class="radio-opt"><input type="radio" name="fitype" value="income"${fi.type==='income'?' checked':''} style="accent-color:var(--green)"><span style="color:var(--green)">固定收入</span></label>
         </div>
       </div>
       <div class="field"><div class="field-label">類別</div>
         <select class="field-select" id="f-cat" onchange="checkCustomCat(this)">
-          ${getCats().map(c=>`<option value="${c.n}">${c.e} ${c.n}</option>`).join('')}
+          ${getCats().map(c=>`<option value="${c.n}"${fi.cat===c.n?' selected':''}>${c.e} ${c.n}</option>`).join('')}
           <option value="custom">＋ 新增自訂類別...</option>
         </select>
       </div>
-      <div class="field"><div class="field-label">名稱</div><input class="field-input" id="f-name" placeholder="例：薪資、房租"/></div>
-      <div class="field"><div class="field-label">金額 TWD</div><input class="field-input" id="f-amount" type="number" placeholder="50000"/></div>
-      <div class="field"><div class="field-label">頻率</div>
-        <select class="field-select" id="f-freq"><option value="monthly">每月</option><option value="halfyearly">每半年</option><option value="yearly">每年</option></select>
+      <div class="field"><div class="field-label">名稱</div><input class="field-input" id="f-name" placeholder="例：薪資、房租" value="${fi.name||''}"/></div>
+      <div class="field"><div class="field-label">連結活存帳戶（選填）</div>
+        <select class="field-select" id="f-fi-linked" onchange="updateFixedItemCurrency()">${linkedOpts}</select>
       </div>
-      <div class="field"><div class="field-label">幾號（選填）</div><input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31"/></div>
+      <div class="field-row">
+        <div class="field"><div class="field-label">貨幣</div><select class="field-select" id="f-fi-currency">${fiCurOpts}</select></div>
+        <div class="field"><div class="field-label">金額</div><input class="field-input" id="f-amount" type="number" placeholder="50000" value="${fi.amount||''}"/></div>
+      </div>
+      <div class="field"><div class="field-label">頻率</div>
+        <select class="field-select" id="f-freq" onchange="toggleCustomDays()">
+          <option value="weekly"${selFreq==='weekly'?' selected':''}>每週</option>
+          <option value="biweekly"${selFreq==='biweekly'?' selected':''}>每兩週</option>
+          <option value="monthly"${selFreq==='monthly'?' selected':''}>每月</option>
+          <option value="halfyearly"${selFreq==='halfyearly'?' selected':''}>每半年</option>
+          <option value="yearly"${selFreq==='yearly'?' selected':''}>每年</option>
+          <option value="custom"${selFreq==='custom'?' selected':''}>自訂天數</option>
+        </select>
+      </div>
+      <div class="field" id="f-custom-days-wrap" style="display:${selFreq==='custom'?'block':'none'}"><div class="field-label">每幾天一次</div><input class="field-input" id="f-custom-days" type="number" min="1" placeholder="例：10" value="${fi.customDays||''}"/></div>
+      <div class="field"><div class="field-label">幾號（月頻選填）</div><input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31" value="${fi.day||''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
@@ -1445,8 +1645,13 @@ function saveModal(){
   else if(type==='fixed-item'){
     const fitype=document.querySelector('input[name="fitype"]:checked')?.value||'expense';
     const cat=vv('cat'),name=vv('name'),amount=parseFloat(vv('amount')),freq=vv('freq')||'monthly',day=vv('day');
+    const fiCur=document.getElementById('f-fi-currency')?.value||'TWD';
+    const customDays=freq==='custom'?parseInt(document.getElementById('f-custom-days')?.value||'0')||null:null;
+    const fiLinkedVal=document.getElementById('f-fi-linked')?.value;
+    const fiLinkedIdx=fiLinkedVal!==''&&fiLinkedVal!=null?parseInt(fiLinkedVal):null;
     if(!name||isNaN(amount)||amount<=0){showToast('請填寫名稱和金額');return;}
-    state.fixedItems.push({type:fitype,cat,name,amount,freq,day:day?parseInt(day):null});
+    if(freq==='custom'&&!customDays){showToast('請填寫自訂天數');return;}
+    state.fixedItems.push({type:fitype,cat,name,amount,currency:fiCur,freq,day:day?parseInt(day):null,customDays,linkedAccountIdx:fiLinkedIdx});
     save();closeModal();renderLedger();return;
   }
   const arr=state[type];
