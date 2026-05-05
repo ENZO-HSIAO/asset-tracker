@@ -1180,7 +1180,7 @@ function renderFixedItems(){
         <div class="item-detail">${freqStr}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}${linkedStr}</div></div>
       <div class="item-right"><div class="item-val" style="color:${fi.type==='income'?'var(--green)':'var(--red)'}">
         ${fi.type==='income'?'+':'-'}${fmtCur(fi.amount,cur)}</div></div>
-      <div class="act-row"><button class="act-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
+      <div class="act-row"><button class="act-btn" onclick="openModal('fixed-item',${i})">✎</button><button class="act-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
     </div>`;
   });
   el.innerHTML=h+'</div>';
@@ -1391,11 +1391,15 @@ function updateFixedItemCurrency(){
     if(acc){curSel.value=acc.currency||'TWD';curSel.disabled=true;}
   }else{curSel.disabled=false;}
 }
-function toggleCustomDays(){
+function toggleFixedItemFields(){
   const freq=document.getElementById('f-freq')?.value;
-  const wrap=document.getElementById('f-custom-days-wrap');
-  if(wrap)wrap.style.display=freq==='custom'?'block':'none';
+  const customWrap=document.getElementById('f-custom-days-wrap');
+  const dayWrap=document.getElementById('f-day-wrap');
+  if(customWrap) customWrap.style.display=freq==='custom'?'block':'none';
+  if(dayWrap) dayWrap.style.display=freq==='monthly'?'block':'none';
 }
+// keep old name as alias
+function toggleCustomDays(){ toggleFixedItemFields(); }
 
 
 function updateEntryCurrency() {
@@ -1414,7 +1418,7 @@ function updateEntryCurrency() {
 
 function openModal(type,idx=-1){
   modalType=type;editIdx=idx;
-  const isEdit=idx>=0,item=isEdit?(type==='custom-asset'?(state.customAssets||[])[idx]||null:state[type]?.[idx]||null):null;
+  const isEdit=idx>=0,item=isEdit?(type==='custom-asset'?(state.customAssets||[])[idx]||null:type==='fixed-item'?(state.fixedItems||[])[idx]||null:state[type]?.[idx]||null):null;
   const T={stock:'股票',crypto:'加密貨幣',gold:'黃金',demand:'活存帳戶',fixed:'定存帳戶',entry:'記帳','fixed-item':'固定項目','savings-new':'新增存款'};
   document.getElementById('modal-title').textContent=(isEdit?'編輯':'新增')+(T[type]||'');
   const body=document.getElementById('modal-body');
@@ -1554,7 +1558,7 @@ function openModal(type,idx=-1){
         <div class="field"><div class="field-label">金額</div><input class="field-input" id="f-amount" type="number" placeholder="50000" value="${fi.amount||''}"/></div>
       </div>
       <div class="field"><div class="field-label">頻率</div>
-        <select class="field-select" id="f-freq" onchange="toggleCustomDays()">
+        <select class="field-select" id="f-freq" onchange="toggleFixedItemFields()">
           <option value="weekly"${selFreq==='weekly'?' selected':''}>每週</option>
           <option value="biweekly"${selFreq==='biweekly'?' selected':''}>每兩週</option>
           <option value="monthly"${selFreq==='monthly'?' selected':''}>每月</option>
@@ -1564,7 +1568,7 @@ function openModal(type,idx=-1){
         </select>
       </div>
       <div class="field" id="f-custom-days-wrap" style="display:${selFreq==='custom'?'block':'none'}"><div class="field-label">每幾天一次</div><input class="field-input" id="f-custom-days" type="number" min="1" placeholder="例：10" value="${fi.customDays||''}"/></div>
-      <div class="field"><div class="field-label">幾號（月頻選填）</div><input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31" value="${fi.day||''}"/></div>
+      <div class="field" id="f-day-wrap" style="display:${selFreq==='monthly'?'block':'none'}"><div class="field-label">幾號（選填）</div><input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31" value="${fi.day||''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
   document.getElementById('modal-overlay').classList.add('open');
@@ -1651,8 +1655,17 @@ function saveModal(){
     const fiLinkedIdx=fiLinkedVal!==''&&fiLinkedVal!=null?parseInt(fiLinkedVal):null;
     if(!name||isNaN(amount)||amount<=0){showToast('請填寫名稱和金額');return;}
     if(freq==='custom'&&!customDays){showToast('請填寫自訂天數');return;}
-    state.fixedItems.push({type:fitype,cat,name,amount,currency:fiCur,freq,day:day?parseInt(day):null,customDays,linkedAccountIdx:fiLinkedIdx});
-    save();closeModal();renderLedger();return;
+    const newItem={type:fitype,cat,name,amount,currency:fiCur,freq,day:day?parseInt(day):null,customDays,linkedAccountIdx:fiLinkedIdx};
+    // 連結活存帳戶：更新餘額
+    if(fiLinkedIdx!=null&&state.demand[fiLinkedIdx]){
+      const acc=state.demand[fiLinkedIdx];
+      const amtTWD=toTWD(amount,fiCur);
+      const accTWD=savTWD(acc);
+      const newTWD=fitype==='income'?accTWD+amtTWD:accTWD-amtTWD;
+      acc.balance=(!acc.currency||acc.currency==='TWD')?parseFloat(newTWD.toFixed(2)):parseFloat((newTWD/state.usdTwd*(state.rates[acc.currency]||1)).toFixed(2));
+    }
+    if(editIdx>=0){state.fixedItems[editIdx]=newItem;}else{state.fixedItems.push(newItem);}
+    save();closeModal();renderLedger();renderSavings();renderHome();return;
   }
   const arr=state[type];
   if(arr){
