@@ -1171,13 +1171,15 @@ function renderFixedItems(){
   state.fixedItems.forEach((fi,i)=>{
     const cat=allCats.find(c=>c.n===fi.cat)||allCats[allCats.length-1];
     const cur=fi.currency||'TWD';
-    const freqStr=fi.freq==='custom'&&fi.customDays?`每${fi.customDays}天`:(freqL[fi.freq||'monthly']);
+    const freqStr=(fi.freq==='custom'&&fi.customDays)?`每${fi.customDays}天`:(freqL[fi.freq||'monthly']);
+    const WD=['日','一','二','三','四','五','六'];
+    const weekdayStr=(fi.weekday!=null&&(fi.freq==='weekly'||fi.freq==='biweekly'))?` · 週${WD[fi.weekday]}`:'';
     const linkedAcc=fi.linkedAccountIdx!=null?state.demand[fi.linkedAccountIdx]:null;
     const linkedStr=linkedAcc?` · 🔗${linkedAcc.name}`:'';
     h+=`<div class="list-item">
       <span style="font-size:16px">${cat.e}</span>
       <div class="item-body"><div class="item-name">${fi.name}</div>
-        <div class="item-detail">${freqStr}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}${linkedStr}</div></div>
+        <div class="item-detail">${freqStr}${weekdayStr}${fi.day?` · ${fi.day}號`:''} · ${fi.type==='income'?'收入':'支出'}${linkedStr}</div></div>
       <div class="item-right"><div class="item-val" style="color:${fi.type==='income'?'var(--green)':'var(--red)'}">
         ${fi.type==='income'?'+':'-'}${fmtCur(fi.amount,cur)}</div></div>
       <div class="act-row"><button class="act-btn" onclick="openModal('fixed-item',${i})">✎</button><button class="act-btn del-btn" onclick="delFixedItem(${i})">×</button></div>
@@ -1391,12 +1393,25 @@ function updateFixedItemCurrency(){
     if(acc){curSel.value=acc.currency||'TWD';curSel.disabled=true;}
   }else{curSel.disabled=false;}
 }
+function updateWeekdayUI(){
+  const checked=document.querySelector('input[name="fi-weekday"]:checked');
+  if(!checked)return;
+  const sel=parseInt(checked.value);
+  document.querySelectorAll('.wd-btn').forEach(btn=>{
+    const isActive=parseInt(btn.dataset.wd)===sel;
+    btn.style.border=`1px solid ${isActive?'var(--accent)':'var(--border)'}`;
+    btn.style.background=isActive?'rgba(0,201,177,0.15)':'transparent';
+    btn.style.color=isActive?'var(--accent)':'var(--text2)';
+  });
+}
 function toggleFixedItemFields(){
   const freq=document.getElementById('f-freq')?.value;
   const customWrap=document.getElementById('f-custom-days-wrap');
   const dayWrap=document.getElementById('f-day-wrap');
+  const weekdayWrap=document.getElementById('f-weekday-wrap');
   if(customWrap) customWrap.style.display=freq==='custom'?'block':'none';
   if(dayWrap) dayWrap.style.display=freq==='monthly'?'block':'none';
+  if(weekdayWrap) weekdayWrap.style.display=(freq==='weekly'||freq==='biweekly')?'block':'none';
 }
 // keep old name as alias
 function toggleCustomDays(){ toggleFixedItemFields(); }
@@ -1568,6 +1583,16 @@ function openModal(type,idx=-1){
         </select>
       </div>
       <div class="field" id="f-custom-days-wrap" style="display:${selFreq==='custom'?'block':'none'}"><div class="field-label">每幾天一次</div><input class="field-input" id="f-custom-days" type="number" min="1" placeholder="例：10" value="${fi.customDays||''}"/></div>
+      <div class="field" id="f-weekday-wrap" style="display:${(selFreq==='weekly'||selFreq==='biweekly')?'block':'none'}">
+        <div class="field-label">星期幾</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:4px">
+          ${['日','一','二','三','四','五','六'].map((d,idx)=>`
+            <label style="display:flex;flex-direction:column;align-items:center;cursor:pointer">
+              <input type="radio" name="fi-weekday" value="${idx}"${(fi.weekday??1)===idx?' checked':''} style="display:none" onchange="updateWeekdayUI()">
+              <div class="wd-btn" data-wd="${idx}" onclick="this.previousElementSibling.checked=true;updateWeekdayUI()" style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;font-size:13px;font-weight:500;border:1px solid ${(fi.weekday??1)===idx?'var(--accent)':'var(--border)'};background:${(fi.weekday??1)===idx?'rgba(0,201,177,0.15)':'transparent'};color:${(fi.weekday??1)===idx?'var(--accent)':'var(--text2)'};transition:all .15s;cursor:pointer">週${d}</div>
+            </label>`).join('')}
+        </div>
+      </div>
       <div class="field" id="f-day-wrap" style="display:${selFreq==='monthly'?'block':'none'}"><div class="field-label">幾號（選填）</div><input class="field-input" id="f-day" type="number" min="1" max="31" placeholder="1–31" value="${fi.day||''}"/></div>
       <button class="save-btn" onclick="saveModal()">儲存</button>`;
   }
@@ -1651,19 +1676,15 @@ function saveModal(){
     const cat=vv('cat'),name=vv('name'),amount=parseFloat(vv('amount')),freq=vv('freq')||'monthly',day=vv('day');
     const fiCur=document.getElementById('f-fi-currency')?.value||'TWD';
     const customDays=freq==='custom'?parseInt(document.getElementById('f-custom-days')?.value||'0')||null:null;
+    const weekdayEl=document.querySelector('input[name="fi-weekday"]:checked');
+    const weekday=(freq==='weekly'||freq==='biweekly')&&weekdayEl?parseInt(weekdayEl.value):null;
     const fiLinkedVal=document.getElementById('f-fi-linked')?.value;
     const fiLinkedIdx=fiLinkedVal!==''&&fiLinkedVal!=null?parseInt(fiLinkedVal):null;
     if(!name||isNaN(amount)||amount<=0){showToast('請填寫名稱和金額');return;}
     if(freq==='custom'&&!customDays){showToast('請填寫自訂天數');return;}
-    const newItem={type:fitype,cat,name,amount,currency:fiCur,freq,day:day?parseInt(day):null,customDays,linkedAccountIdx:fiLinkedIdx};
-    // 連結活存帳戶：更新餘額
-    if(fiLinkedIdx!=null&&state.demand[fiLinkedIdx]){
-      const acc=state.demand[fiLinkedIdx];
-      const amtTWD=toTWD(amount,fiCur);
-      const accTWD=savTWD(acc);
-      const newTWD=fitype==='income'?accTWD+amtTWD:accTWD-amtTWD;
-      acc.balance=(!acc.currency||acc.currency==='TWD')?parseFloat(newTWD.toFixed(2)):parseFloat((newTWD/state.usdTwd*(state.rates[acc.currency]||1)).toFixed(2));
-    }
+    const newItem={type:fitype,cat,name,amount,currency:fiCur,freq,day:day?parseInt(day):null,customDays,weekday,linkedAccountIdx:fiLinkedIdx};
+    // 固定項目只記錄計畫，不立即異動帳戶餘額
+    // 帳戶餘額異動請在「記帳」功能中手動記錄
     if(editIdx>=0){state.fixedItems[editIdx]=newItem;}else{state.fixedItems.push(newItem);}
     save();closeModal();renderLedger();renderSavings();renderHome();return;
   }
